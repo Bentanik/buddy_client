@@ -7,7 +7,10 @@ import {
   UpdateEmailUserApi,
   UpdateFullNameUserApi,
 } from "@/apis/user/profile-private";
-import { clearCoverPhotoUser, setCoverPhotoUser } from "@/stores/publicUserProfileSlice";
+import {
+  clearCoverPhotoUser,
+  setCoverPhotoUser,
+} from "@/stores/publicUserProfileSlice";
 import { clearAvatarUser, setAvatarUser } from "@/stores/userSlice";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 

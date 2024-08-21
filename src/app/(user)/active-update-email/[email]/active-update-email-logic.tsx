@@ -27,10 +27,13 @@ export default function ActiveUpdateEmailLogic({ children, activeAccountEmail }:
             );
         } catch (err) {
             const errors = err as ErrorResponse[];
-            return toast.custom(
-                () => <ToastAlert type="error" title="Error" desc={errors[0].errorMessage} />,
-                { duration: 99999 }
-            );
+            if (errors) {
+                return toast.custom(
+                    () => <ToastAlert type="error" title="Error" desc={errors[0]?.errorMessage || "Error"} />,
+                    { duration: 99999 }
+                );
+            }
+            return err;
         }
     }
 

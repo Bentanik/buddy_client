@@ -11,13 +11,11 @@ axiosInstance.defaults.timeout = 1000 * 60 * 10;
 axiosInstance.defaults.withCredentials = true;
 
 axiosInstance.interceptors.request.use((config) => {
-    const token = JSON.parse(window.localStorage.getItem("accessToken") || "");
-
-    if (token !== "") {
-        if (token?.tokenType && token?.accessToken) {
-            config.headers.Authorization = `${token?.tokenType} ${token?.accessToken}`
-        } else {
-            config.headers.Authorization = null;
+    const accessTokenLocalStorage = window.localStorage.getItem("accessToken");
+    if (accessTokenLocalStorage) {
+        const parseAccessToken = JSON.parse(accessTokenLocalStorage);
+        if (parseAccessToken?.tokenType && parseAccessToken?.accessToken) {
+            config.headers.Authorization = `${parseAccessToken?.tokenType} ${parseAccessToken?.accessToken}`
         }
     }
 
