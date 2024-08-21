@@ -72,11 +72,12 @@ export default function UpdateCoverPhoto() {
         <div>
             <figure className="w-full h-[400px] overflow-hidden rounded-b-lg">
                 {coverPhotoSrc === null ? <div>
-                    <img
-                        src={publicProfileState.data.cropCoverPhoto}
+                    {!publicProfileState.data.cropCoverPhoto?.includes("null") ? <img
+                        src={publicProfileState.data.cropCoverPhoto || "/home.jpg"}
                         alt="Thumnail"
                         className="w-full h-[400px] object-cover"
-                    />
+                    /> : <div className="w-full h-[400px] bg-gray-200">
+                    </div>}
                 </div> :
                     <div>
                         {userProfileState.profilePrivate.statusUpdateCoverPhoto !== "loading" ? <CropImageCoverPhotoProfile image={coverPhotoSrc} onCancel={handleCancelSaveCoverPhoto} onSubmit={handleSubmit} /> :
