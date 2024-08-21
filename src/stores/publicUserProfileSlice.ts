@@ -34,7 +34,7 @@ let initialState: InitialState = {
 };
 
 export const getProfileUserThunk = createAsyncThunk(
-  "auth/getProfileUser",
+  "user/getProfileUser",
   async (data: GetProfileUserData, { rejectWithValue }) => {
     try {
       const response = await GetProfilePublicApi(data);
@@ -43,6 +43,7 @@ export const getProfileUserThunk = createAsyncThunk(
       }
       return response.data;
     } catch (err: any) {
+      console.log(err);
       return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
     }
   }
@@ -84,6 +85,7 @@ const publicUserProfileSlice = createSlice({
   },
 });
 
-export const {clearCoverPhotoUser, setCoverPhotoUser} = publicUserProfileSlice.actions;
+export const { clearCoverPhotoUser, setCoverPhotoUser } =
+  publicUserProfileSlice.actions;
 
 export default publicUserProfileSlice.reducer;

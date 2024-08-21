@@ -49,7 +49,7 @@ export default function LoginForm() {
         } catch (err) {
             const errors = err as ErrorResponse[];
 
-            if (errors[0]?.errorCode === "lg01") {
+            if (errors && errors[0]?.errorCode === "lg01") {
                 return toast.custom(
                     () => <ToastAlert type="error" title="Error" desc={errors[0]?.errorMessage} />,
                     { duration: 99999 }
@@ -112,7 +112,7 @@ export default function LoginForm() {
             </div>
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
-                open={authState.status === "loading"}
+                open={authState?.status === "loading"}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>

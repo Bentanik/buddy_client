@@ -25,8 +25,9 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["authSlice", "userSlice"],
+  whitelist: ["userSlice"],
   blacklist: [
+    "authSlice",
     "registerSlice",
     "activeAccountSlice",
     "userProfileSlice",
@@ -40,7 +41,7 @@ const rootReducer = combineReducers({
   authSlice: authSlice,
   userSlice: userSlice,
   userProfileSlice: userProfileSlice,
-  publicUserProfileSlice: publicUserProfileSlice
+  publicUserProfileSlice: publicUserProfileSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

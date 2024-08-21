@@ -1,5 +1,4 @@
 import { RefreshTokenApi } from "@/apis/auth/auth";
-import { resetAuthState, setToken } from "@/stores/authSlice";
 import { store } from "@/stores/store";
 import { resetUserState } from "@/stores/userSlice";
 import axios from "axios"
@@ -12,11 +11,14 @@ axiosInstance.defaults.timeout = 1000 * 60 * 10;
 axiosInstance.defaults.withCredentials = true;
 
 axiosInstance.interceptors.request.use((config) => {
-    const state = store.getState();
-    const token = state.authSlice.token;
+    const token = JSON.parse(window.localStorage.getItem("accessToken") || "");
 
-    if (token) {
-        config.headers.Authorization = `${token.tokenType} ${token.accessToken}`
+    if (token !== "") {
+        if (token?.tokenType && token?.accessToken) {
+            config.headers.Authorization = `${token?.tokenType} ${token?.accessToken}`
+        } else {
+            config.headers.Authorization = null;
+        }
     }
 
     return config;
@@ -29,15 +31,19 @@ let refreshTokenPromise: any = null;
 axiosInstance.interceptors.response.use((response) => {
     return response;
 }, async (error) => {
-    const { config, response: { status } } = error;
-
-    if (status === 401 && config) {
+    if (error?.response?.status === 401 && error?.config) {
         if (!refreshTokenPromise) {
-            refreshTokenPromise = RefreshTokenApi().then((res) => {
-                store.dispatch(setToken(res?.data?.data?.token));
+            refreshTokenPromise = RefreshTokenApi().then((res: any) => {
+                window.localStorage.setItem(
+                    "accessToken",
+                    JSON.stringify(res?.data?.data?.token)
+                );
                 axiosInstance.defaults.headers.Authorization = `${res?.data?.data?.tokenType} ${res?.data?.data?.accessToken}`
-            }).catch((err) => {
-                store.dispatch(resetAuthState());
+            }).catch((err: any) => {
+                window.localStorage.setItem(
+                    "accessToken",
+                    JSON.stringify("")
+                );
                 store.dispatch(resetUserState());
                 location.href = "/";
                 return Promise.reject(err);
@@ -47,7 +53,7 @@ axiosInstance.interceptors.response.use((response) => {
         }
 
         return refreshTokenPromise?.then(() => {
-            return axiosInstance(config);
+            return axiosInstance(error?.config);
         })
     }
 

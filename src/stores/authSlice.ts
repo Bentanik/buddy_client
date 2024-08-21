@@ -26,6 +26,10 @@ export interface InitialState {
 let initialState: InitialState = {
   status: "idle",
   statusLogout: "idle",
+  token: {
+    tokenType: "",
+    accessToken: "",
+  },
   error: null,
 };
 
@@ -79,7 +83,10 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.token = action.payload?.data?.token;
+        window.localStorage.setItem(
+          "accessToken",
+          JSON.stringify(action.payload?.data?.token)
+        );
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {

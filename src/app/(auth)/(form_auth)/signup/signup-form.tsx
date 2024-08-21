@@ -102,7 +102,7 @@ export default function SignUpForm() {
             </div>
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
-                open={registerState.status === "loading"}
+                open={registerState?.status === "loading"}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>

@@ -18,7 +18,6 @@ export interface DataProfilePrivate {
   biography?: string | null;
   cropAvatar?: string;
   fullAvatar?: string;
-  cropCoverPhoto?: string;
 }
 
 export interface DataUpdateEmail {
@@ -83,7 +82,6 @@ let initialState: InitialState = {
       biography: null,
       cropAvatar: "",
       fullAvatar: "",
-      cropCoverPhoto: "",
     },
   },
 };
@@ -279,11 +277,8 @@ const userProfileSlice = createSlice({
       .addCase(updateCoverPhotoThunk.pending, (state) => {
         state.profilePrivate.statusUpdateCoverPhoto = "loading";
       })
-      .addCase(updateCoverPhotoThunk.fulfilled, (state, action) => {
+      .addCase(updateCoverPhotoThunk.fulfilled, (state) => {
         state.profilePrivate.statusUpdateCoverPhoto = "succeeded";
-        if (state.profilePrivate && state.profilePrivate.data) {
-          state.profilePrivate.data.cropCoverPhoto = action.payload;
-        }
         state.profilePrivate.error = null;
       })
       .addCase(updateCoverPhotoThunk.rejected, (state) => {
