@@ -78,14 +78,6 @@ export default function ProfileComponent() {
         }
     }
 
-    const fetchUserProfile1 = async () => {
-        try {
-            await GetProfilePrivateApi();
-        } catch (err) {
-            return err;
-        }
-    }
-
     useEffect(() => {
         fetchUserProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,7 +99,7 @@ export default function ProfileComponent() {
                                 <AvatarProfile />
 
                                 <div className="inline-block">
-                                    <h2 className="text-2xl font-semibold font-poppins">Nguyen Mai Viet Vy</h2>
+                                    <h2 className="text-2xl font-semibold font-poppins">{publicProfileState.data.fullName}</h2>
                                     <p className="mt-[3px] text-base text-gray-600">100 friends</p>
                                 </div>
                             </div>

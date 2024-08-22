@@ -57,6 +57,11 @@ const userSlice = createSlice({
           `${process.env.NEXT_PUBLIC_SERVER}/${process.env.NEXT_PUBLIC_SERVER_GET_IMAGE}${action.payload}`;
       }
     },
+    setFullNameUser: (state, action) => {
+      if (state.user) {
+        state.user.fullName = action.payload;
+      }
+    },
     resetUserState: (state) => {
       state.user = null;
       state.status = "idle";
@@ -65,7 +70,12 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearAvatarUser, setAvatarUser, resetUserState } =
-  userSlice.actions;
+export const {
+  setUser,
+  clearAvatarUser,
+  setAvatarUser,
+  setFullNameUser,
+  resetUserState,
+} = userSlice.actions;
 
 export default userSlice.reducer;

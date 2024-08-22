@@ -11,7 +11,11 @@ import {
   clearCoverPhotoUser,
   setCoverPhotoUser,
 } from "@/stores/publicUserProfileSlice";
-import { clearAvatarUser, setAvatarUser } from "@/stores/userSlice";
+import {
+  clearAvatarUser,
+  setAvatarUser,
+  setFullNameUser,
+} from "@/stores/userSlice";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface DataProfilePrivate {
@@ -136,12 +140,13 @@ export const activeUpdateEmailThunk = createAsyncThunk(
 
 export const UpdateFullNameThunk = createAsyncThunk(
   "user/updateFullName",
-  async (data: DataUpdateFullName, { rejectWithValue }) => {
+  async (data: DataUpdateFullName, { rejectWithValue, dispatch }) => {
     try {
       const response = await UpdateFullNameUserApi(data);
       if (response?.data?.error === 1) {
         return rejectWithValue(response?.data?.data as ErrorResponse[]);
       }
+      dispatch(setFullNameUser(response?.data?.data));
       return response.data;
     } catch (err: any) {
       return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
