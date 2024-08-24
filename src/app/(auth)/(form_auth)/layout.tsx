@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Toaster } from 'sonner'
 
 
-const Scene = dynamic(() => import("@/app/components/Thread/Scene"), { ssr: false })
+const Scene = dynamic(() => import("@/components/Thread/Scene"), { ssr: false })
 
 export default function AuthLayout({
     children,

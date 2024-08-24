@@ -1,6 +1,6 @@
 'use client'
-import InputAuth from "@/app/components/Input/InputAuth";
-import ToastAlert from "@/app/components/ToastCustom/ToastAlert";
+import InputAuth from "@/components/Input/InputAuth";
+import ToastAlert from "@/components/ToastCustom/ToastAlert";
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema";
 import { ErrorResponse } from "@/stores/registerSlice";
 import { registerUser } from "@/stores/registerSlice";

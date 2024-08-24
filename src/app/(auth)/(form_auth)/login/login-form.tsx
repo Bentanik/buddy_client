@@ -9,8 +9,8 @@ import { ErrorResponse, loginUser } from "@/stores/authSlice";
 import { toast } from "sonner";
 import Image from "next/image";
 import { Backdrop, CircularProgress } from "@mui/material";
-import InputAuth from "@/app/components/Input/InputAuth";
-import ToastAlert from "@/app/components/ToastCustom/ToastAlert";
+import InputAuth from "@/components/Input/InputAuth";
+import ToastAlert from "@/components/ToastCustom/ToastAlert";
 
 export default function LoginForm() {
 

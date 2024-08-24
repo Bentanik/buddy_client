@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Backdrop, CircularProgress } from '@mui/material';
 import { toast } from 'sonner';
 import { activeUpdateEmailThunk } from '@/stores/userProfileSlice';
-import ToastAlert from '@/app/components/ToastCustom/ToastAlert';
+import ToastAlert from '@/components/ToastCustom/ToastAlert';
 
 interface ActiveAccountProps {
     children: React.ReactNode

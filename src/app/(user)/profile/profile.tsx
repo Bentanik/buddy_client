@@ -1,18 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import HeaderComponent from "@/app/components/Header/Header";
+import HeaderComponent from "@/components/Header/Header";
 import { GraduationCap, Pencil } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import HomeUploadPost from "@/app/components/HomeUploadPost/HomeUploadPost";
-import TextViewMore from "@/app/components/TextViewMore/TextViewMore";
+import HomeUploadPost from "@/components/HomeUploadPost/HomeUploadPost";
+import TextViewMore from "@/components/TextViewMore/TextViewMore";
 import Link from "next/link";
-import PostStatus from "@/app/components/PostStatus/PostStatus";
-import AvatarProfile from "@/app/components/AvatarProfile/AvatarProfile";
+import PostStatus from "@/components/PostStatus/PostStatus";
+import AvatarProfile from "@/components/AvatarProfile/AvatarProfile";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
-import UpdateCoverPhoto from "@/app/components/UpdateCoverPhoto/UpdateCoverPhoto";
+import UpdateCoverPhoto from "@/components/UpdateCoverPhoto/UpdateCoverPhoto";
 import { getProfileUserThunk } from "@/stores/publicUserProfileSlice";
-import { GetProfilePrivateApi } from "@/apis/user/profile-private";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 
 let longText = `Mình hoàn toàn đồng ý với anh Tiến về bài viết này bởi mình từng tự học nhiều thứ. Từ tự học những kỹ năng đời thường như học nấu món ăn mới cho tới học kỹ thuật bơi đúng, đẹp và tự học tiếng Anh, marketing, tài chính. 
@@ -71,7 +71,7 @@ export default function ProfileComponent() {
     const fetchUserProfile = () => {
         try {
             dispatch(getProfileUserThunk({
-                email: userState.user?.email ?? ""
+                userId: userState.user?.id ?? ""
             }));
         } catch (err) {
             return err;
@@ -85,16 +85,16 @@ export default function ProfileComponent() {
 
     return (
         <div>
+            <header className={`sticky top-0 w-full z-50`}>
+                <HeaderComponent />
+            </header>
             {publicProfileState.status !== 'loading' && publicProfileState.data !== null && <div>
-                <header className={`sticky top-0 w-full z-50`}>
-                    <HeaderComponent />
-                </header>
-                <section className="bg-profile-hero h-[550px] shadow-profile-hero pb-5 z-10 overflow-hidden">
-                    <div className="relative max-w-[1120px] h-[530px] mx-auto ">
+                <section className="bg-profile-hero h-[580px] shadow-profile-hero pb-5 z-10 overflow-hidden">
+                    <div className="relative max-w-[1120px] h-[540px] mx-auto">
                         <figure className="absolute w-full">
                             <UpdateCoverPhoto />
                         </figure>
-                        <div className="absolute -bottom-[10px] transform w-full pl-[4%] pr-[2%] flex justify-between items-baseline z-30">
+                        <div className="absolute bottom-[0] transform w-full pl-[4%] pr-[2%] flex justify-between items-baseline z-30">
                             <div className="flex gap-4 items-center">
                                 <AvatarProfile />
 
@@ -103,7 +103,7 @@ export default function ProfileComponent() {
                                     <p className="mt-[3px] text-base text-gray-600">100 friends</p>
                                 </div>
                             </div>
-                            <div>
+                            <div className="-translate-y-4">
                                 <button className="px-3 py-2 bg-blue-400 rounded-xl hover:bg-blue-500">
                                     <div className="flex items-center gap-x-3">
                                         <i>
@@ -198,6 +198,14 @@ export default function ProfileComponent() {
                     <PostStatus open={postStatus} onClose={handleClosePostStatus} />
                 </div>
             </div>}
+            <div>
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
+                    open={publicProfileState?.status === "loading"}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+            </div>
         </div>
     )
 }

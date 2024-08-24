@@ -6,7 +6,8 @@ import { Shield, User, X } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/stores/store";
-import SettingInformationUser from "@/app/components/SettingInformationUser/SettingInformationUser";
+import SettingInformationUser from "@/components/SettingInformationUser/SettingInformationUser";
+import { Toaster } from "sonner";
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +33,14 @@ export default function SettingProfilePage() {
 
     return (
         <div className={cx("wrapper")}>
+            <section>
+                <Toaster
+                    position="top-right"
+                    richColors
+                    expand={true}
+                    style={{ marginRight: 28 }}
+                />
+            </section>
             <div className={cx("container")}>
                 <div className={cx("row")}>
                     <div className={cx("left", "top-left")}>

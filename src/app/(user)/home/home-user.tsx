@@ -1,12 +1,12 @@
 'use client'
-import HeaderComponent from "@/app/components/Header/Header";
+import HeaderComponent from "@/components/Header/Header";
 import styles from "@/app/(user)/home/home.module.css";
 import Image from "next/image";
-import TextViewMore from "@/app/components/TextViewMore/TextViewMore";
-import HomeMessage from "@/app/components/HomeMessage/HomeMessage";
-import HomeFollow from "@/app/components/HomeFollow/HomeFollow";
-import HomeSidebar from "@/app/components/HomeSidebar/HomeSidebar";
-import HomeUploadPost from "@/app/components/HomeUploadPost/HomeUploadPost";
+import TextViewMore from "@/components/TextViewMore/TextViewMore";
+import HomeMessage from "@/components/HomeMessage/HomeMessage";
+import HomeFollow from "@/components/HomeFollow/HomeFollow";
+import HomeSidebar from "@/components/HomeSidebar/HomeSidebar";
+import HomeUploadPost from "@/components/HomeUploadPost/HomeUploadPost";
 
 let longText = `Mình hoàn toàn đồng ý với anh Tiến về bài viết này bởi mình từng tự học nhiều thứ. Từ tự học những kỹ năng đời thường như học nấu món ăn mới cho tới học kỹ thuật bơi đúng, đẹp và tự học tiếng Anh, marketing, tài chính. 
 Khoảng 15 năm trước đây, khi mình khởi nghiệp, bắt đầu làm quen với những thứ không quen thuộc, như báo cáo tài chính, bảng cân đối, lưu chuyển tiền tệ, nhân sự, marketing... Lúc đó mình nghĩ làm thế nào để học nhanh, hiểu bản chất và áp dụng ngay vào công việc. Mình đọc sách. Mỗi lĩnh vực mình chọn ra 10 cuốn sách tạm gọi là hay nhất để đọc. Vừa đọc vừa so sánh, đối chiếu với công việc trong thực tiễn, vừa trao đổi với những người có chuyên môn sâu về lĩnh vực này. Và vì vậy, trong thời gian ngắn, với kỹ năng TỰ HỌC, mình đã trang bị cho bản thân những kiến thức, kỹ năng mới để đáp ứng yêu cầu ngày càng cao của công việc trong một số lĩnh vực mới. 
