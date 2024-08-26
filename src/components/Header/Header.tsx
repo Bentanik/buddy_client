@@ -8,6 +8,7 @@ import { useState } from "react";
 import TippyHeadless from "@tippyjs/react/headless";
 import MenuAvatarHeader from "@/components/MenuAvatar/MenuAvatarHeader";
 import SearchComponent from "@/components/Search/SearchComponent";
+import NotificationComponent from "@/components/Notification/NotificationComponent";
 
 export default function HeaderComponent() {
     const router = useRouter();
@@ -50,8 +51,8 @@ export default function HeaderComponent() {
                 <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300">
                     <MessageCircleMore className="text-gray-500 group-hover:text-gray-800" />
                 </div>
-                <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300">
-                    <Bell className="text-gray-500 group-hover:text-gray-800" />
+                <div>
+                    <NotificationComponent />
                 </div>
                 <div className="inline-flex items-center gap-x-3 p-2 cursor-pointer rounded-lg">
                     {userState?.user?.avatar && userState?.user?.avatar !== "" ? <TippyHeadless
