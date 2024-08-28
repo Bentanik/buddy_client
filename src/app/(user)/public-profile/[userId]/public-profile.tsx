@@ -264,16 +264,9 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
                                                             <div className='px-2 py-1'>
                                                                 <div className='px-2 py-2 rounded-md  cursor-pointer hover:bg-gray-200' onClick={handleUnfriend}>
                                                                     <div className='flex gap-x-2 '>
-                                                                        {
-                                                                            (publicProfileState.statusDeleteFriend !== "idle" &&
-                                                                                publicProfileState.statusDeleteFriend === "loading") ?
-                                                                                <CircularProgress
-                                                                                    size={24}
-                                                                                    sx={{ color: '#fff' }} /> :
-                                                                                <i>
-                                                                                    <UserPlus className="text-gray-800 w-6 h-6" />
-                                                                                </i>
-                                                                        }
+                                                                        <i>
+                                                                            <UserX className="text-gray-800 w-6 h-6" />
+                                                                        </i>
                                                                         <span className="text-base font-medium">Unfriend</span>
                                                                     </div>
                                                                 </div>

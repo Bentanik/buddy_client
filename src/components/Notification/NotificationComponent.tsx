@@ -107,7 +107,6 @@ export default function NotificationComponent() {
             onClickOutside={handleClosePopup}
         >
             <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300 relative" onClick={handleTogglePopup}>
-
                 <Bell className="text-gray-500 group-hover:text-gray-800" />
                 {notificationState.countNotification !== 0 && <div className="absolute top-1 right-0 translate-x-1/2 -translate-y-1/2 w-7 h-7 bg-purple-500 rounded-md inline-flex items-center justify-center">
                     <span className="text-[13px] text-gray-200">{notificationState.countNotification}</span>
