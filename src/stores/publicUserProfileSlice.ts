@@ -1,8 +1,12 @@
-import { Data } from "./userSlice";
 import { GetProfilePublicApi } from "@/apis/user/profile-public";
-import { GetStatusFriendApi, PostAddFriendApi } from "@/apis/user/user";
+import {
+  GetStatusFriendApi,
+  PutAcceptFriendApi,
+  PostAddFriendApi,
+  PutRejectFriendApi,
+  DeleteUnfriendApi,
+} from "@/apis/user/user";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { stat } from "fs";
 
 export interface GetProfileUserData {
   userId: string;
@@ -12,6 +16,9 @@ export interface GetStatusFriendData {
 }
 export interface PostStatusFriendData {
   userId: string;
+}
+export interface PostAcceptFriendData {
+  userReceiveId: string;
 }
 
 export interface DataProfile {
@@ -31,6 +38,9 @@ export interface InitialState {
   status: string;
   statusAddFriendStatus?: string;
   statusGetFriendStatus?: string;
+  statusAcceptFriend?: string;
+  statusRejectFriend?: string;
+  statusDeleteFriend?: string;
   error?: ErrorResponse[] | null;
   data: DataProfile;
 }
@@ -39,6 +49,9 @@ let initialState: InitialState = {
   status: "idle",
   statusAddFriendStatus: "idle",
   statusGetFriendStatus: "idle",
+  statusAcceptFriend: "idle",
+  statusRejectFriend: "idle",
+  statusDeleteFriend: "idle",
   error: null,
   data: {
     userId: "",
@@ -83,6 +96,51 @@ export const postAddFriendThunk = createAsyncThunk(
   async (data: PostStatusFriendData, { rejectWithValue }) => {
     try {
       const response = await PostAddFriendApi(data);
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
+
+export const putAcceptFriendThunk = createAsyncThunk(
+  "user/postAcceptFriend",
+  async (data: PostAcceptFriendData, { rejectWithValue }) => {
+    try {
+      const response = await PutAcceptFriendApi(data);
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
+
+export const putRejectFriendThunk = createAsyncThunk(
+  "user/postRejectFriend",
+  async (data: PostAcceptFriendData, { rejectWithValue }) => {
+    try {
+      const response = await PutRejectFriendApi(data);
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
+
+export const deleteUnfriendThunk = createAsyncThunk(
+  "user/deleteUnfriend",
+  async (data: PostAcceptFriendData, { rejectWithValue }) => {
+    try {
+      const response = await DeleteUnfriendApi(data);
       if (response?.data?.error === 1) {
         return rejectWithValue(response?.data?.data as ErrorResponse[]);
       }
@@ -151,6 +209,39 @@ const publicUserProfileSlice = createSlice({
       })
       .addCase(postAddFriendThunk.rejected, (state, action) => {
         state.statusAddFriendStatus = "failed";
+        state.error = action.payload as ErrorResponse[];
+      })
+      //  ======================
+      .addCase(putAcceptFriendThunk.pending, (state) => {
+        state.statusAcceptFriend = "loading";
+      })
+      .addCase(putAcceptFriendThunk.fulfilled, (state) => {
+        state.statusAcceptFriend = "succeeded";
+      })
+      .addCase(putAcceptFriendThunk.rejected, (state, action) => {
+        state.statusAcceptFriend = "failed";
+        state.error = action.payload as ErrorResponse[];
+      })
+      //  ======================
+      .addCase(putRejectFriendThunk.pending, (state) => {
+        state.statusRejectFriend = "loading";
+      })
+      .addCase(putRejectFriendThunk.fulfilled, (state) => {
+        state.statusRejectFriend = "succeeded";
+      })
+      .addCase(putRejectFriendThunk.rejected, (state, action) => {
+        state.statusRejectFriend = "failed";
+        state.error = action.payload as ErrorResponse[];
+      })
+      //  ======================
+      .addCase(deleteUnfriendThunk.pending, (state) => {
+        state.statusDeleteFriend = "loading";
+      })
+      .addCase(deleteUnfriendThunk.fulfilled, (state) => {
+        state.statusDeleteFriend = "succeeded";
+      })
+      .addCase(deleteUnfriendThunk.rejected, (state, action) => {
+        state.statusDeleteFriend = "failed";
         state.error = action.payload as ErrorResponse[];
       });
   },

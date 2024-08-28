@@ -1,5 +1,5 @@
+import { GetTwoNotificationFriendApi } from "@/apis/user/notification";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
 export interface ErrorResponse {
   errorCode: string;
   errorMessage: string;
@@ -13,6 +13,7 @@ export interface InitialNotificationFriendProps {
 
 export interface InitialState {
   status: string;
+  statusNotificationFriend: string;
   error?: ErrorResponse[] | null;
   countNotification: number;
   initialNotificationFriend?: InitialNotificationFriendProps | null;
@@ -20,6 +21,7 @@ export interface InitialState {
 
 let initialState: InitialState = {
   status: "idle",
+  statusNotificationFriend: "idle",
   error: null,
   countNotification: 0,
   initialNotificationFriend: {
@@ -28,6 +30,21 @@ let initialState: InitialState = {
     cropAvatar: "",
   },
 };
+
+export const GetTwoNotificationFriendThunk = createAsyncThunk(
+  "auth/GetFourNotificationFriend",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await GetTwoNotificationFriendApi();
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
 
 const notificationSlice = createSlice({
   name: "notificationSlice",
@@ -44,7 +61,19 @@ const notificationSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(GetTwoNotificationFriendThunk.pending, (state) => {
+        state.statusNotificationFriend = "loading";
+      })
+      .addCase(GetTwoNotificationFriendThunk.fulfilled, (state) => {
+        state.statusNotificationFriend = "succeeded";
+        state.error = null;
+      })
+      .addCase(GetTwoNotificationFriendThunk.rejected, (state) => {
+        state.statusNotificationFriend = "failed";
+      });
+  },
 });
 
 export const { setCountNotification, setNotificationFriend } =

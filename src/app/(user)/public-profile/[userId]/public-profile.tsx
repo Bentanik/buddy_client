@@ -2,13 +2,15 @@
 'use client'
 import HeaderComponent from '@/components/Header/Header'
 import TextViewMore from '@/components/TextViewMore/TextViewMore'
-import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, postAddFriendThunk } from '@/stores/publicUserProfileSlice'
+import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, putAcceptFriendThunk, postAddFriendThunk, putRejectFriendThunk, deleteUnfriendThunk } from '@/stores/publicUserProfileSlice'
 import { useAppDispatch, useAppSelector } from '@/stores/store'
 import { Backdrop, CircularProgress } from '@mui/material'
 import { GraduationCap, UserCheck, UserPlus, UserX } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import TippyHeadless from "@tippyjs/react/headless";
+
 
 interface PublicProfileComponentProps {
     userId: string
@@ -28,6 +30,12 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
 
     const [statusFriend, setStatusFriend] = useState<StatusFriendProps | null>(null);
 
+    const [openOptionFriended, setOpenFriended] = useState(false);
+
+    const handleToggleOpenFriended = () => setOpenFriended(prev => !prev);
+
+    const handleCloseFriended = () => setOpenFriended(false);
+
     const fetchUserProfile = async () => {
         try {
             await dispatch(getProfileUserThunk({
@@ -45,6 +53,7 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
             })).unwrap();
             setStatusFriend(res?.data);
         } catch (err) {
+            setStatusFriend(null);
             return err;
         }
     }
@@ -64,6 +73,68 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
         } catch (err) {
             const errors = err as ErrorResponse[];
 
+            if (errors && errors[0]?.errorCode === "adfr03") {
+                window.location.reload()
+            }
+            return err;
+        }
+    }
+
+    useEffect(() => {
+        if (publicProfileState.statusAcceptFriend !== "idle" && publicProfileState.statusAcceptFriend !== "loading") {
+            fetchStatusFriendUserProfile();
+        }
+    }, [publicProfileState.statusAcceptFriend])
+
+    useEffect(() => {
+        if (publicProfileState.statusRejectFriend !== "idle" && publicProfileState.statusRejectFriend !== "loading") {
+            fetchStatusFriendUserProfile();
+        }
+    }, [publicProfileState.statusRejectFriend])
+
+    useEffect(() => {
+        if (publicProfileState.statusDeleteFriend !== "idle" && publicProfileState.statusDeleteFriend !== "loading") {
+            fetchStatusFriendUserProfile();
+        }
+    }, [publicProfileState.statusDeleteFriend])
+
+    const handleAcceptFriend = async () => {
+        try {
+            await dispatch(putAcceptFriendThunk({
+                userReceiveId: publicProfileState.data.userId
+            })).unwrap();
+        } catch (err) {
+            const errors = err as ErrorResponse[];
+
+            if (errors && errors[0]?.errorCode === "adfr03") {
+                window.location.reload()
+            }
+            return err;
+        }
+    }
+
+    const handleRejectFriend = async () => {
+        try {
+            await dispatch(putRejectFriendThunk({
+                userReceiveId: publicProfileState.data.userId
+            })).unwrap();
+        } catch (err) {
+            const errors = err as ErrorResponse[];
+            if (errors && errors[0]?.errorCode === "adfr03") {
+                window.location.reload()
+            }
+            return err;
+        }
+    }
+
+    const handleUnfriend = async () => {
+        handleCloseFriended();
+        try {
+            await dispatch(deleteUnfriendThunk({
+                userReceiveId: publicProfileState.data.userId
+            })).unwrap();
+        } catch (err) {
+            const errors = err as ErrorResponse[];
             if (errors && errors[0]?.errorCode === "adfr03") {
                 window.location.reload()
             }
@@ -117,37 +188,63 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
                             <div className="-translate-y-4">
                                 {statusFriend === null ? <button className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]" onClick={handleAddFriend}>
                                     <div className="flex items-center gap-x-3">
-                                        <i>
-                                            <UserPlus className="text-black w-6 h-6" />
-                                        </i>
+                                        {publicProfileState?.statusAddFriendStatus !== "idle" && publicProfileState?.statusAddFriendStatus === "loading" ?
+                                            <CircularProgress
+                                                size={24}
+                                                sx={{ color: '#000' }} /> :
+                                            <i>
+                                                <UserPlus className="text-black w-6 h-6" />
+                                            </i>}
                                         <span className="text-base font-medium">Add friend</span>
                                     </div>
                                 </button> :
                                     <div>
                                         {statusFriend?.status === 0 &&
                                             <>
-                                                {statusFriend?.isUserInit ? <button className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]">
+                                                {statusFriend?.isUserInit ? <button type="button" className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]" onClick={handleRejectFriend}>
                                                     <div className="flex items-center gap-x-3">
-                                                        <i>
-                                                            <UserX className="text-black w-6 h-6" />
-                                                        </i>
+                                                        {
+                                                            (publicProfileState.statusRejectFriend !== "idle" &&
+                                                                publicProfileState.statusRejectFriend === "loading") ?
+                                                                <CircularProgress
+                                                                    size={24}
+                                                                    sx={{ color: '#000' }} /> :
+                                                                <i>
+                                                                    <UserX className="text-black w-6 h-6" />
+                                                                </i>
+                                                        }
                                                         <span className="text-base font-medium">Cancel invitation</span>
                                                     </div>
                                                 </button> :
                                                     <div className='flex items-center gap-x-3'>
-                                                        <button className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]">
+                                                        <button className="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700"
+                                                            onClick={handleAcceptFriend}
+                                                        >
                                                             <div className="flex items-center gap-x-3">
-                                                                <i>
-                                                                    <UserPlus className="text-black w-6 h-6" />
-                                                                </i>
-                                                                <span className="text-base font-medium">Accept friend</span>
+                                                                {
+                                                                    (publicProfileState.statusAcceptFriend !== "idle" &&
+                                                                        publicProfileState.statusAcceptFriend === "loading") ?
+                                                                        <CircularProgress
+                                                                            size={24}
+                                                                            sx={{ color: '#fff' }} /> : <i>
+                                                                            <UserPlus className="text-gray-200 w-6 h-6" />
+                                                                        </i>
+                                                                }
+
+                                                                <span className="text-base text-gray-200 font-medium">Accept friend</span>
                                                             </div>
                                                         </button>
-                                                        <button className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]">
+                                                        <button type='button' className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]" onClick={handleRejectFriend}>
                                                             <div className="flex items-center gap-x-3">
-                                                                <i>
-                                                                    <UserX className="text-black w-6 h-6" />
-                                                                </i>
+                                                                {
+                                                                    (publicProfileState.statusAcceptFriend !== "idle" &&
+                                                                        publicProfileState.statusRejectFriend === "loading") ?
+                                                                        <CircularProgress
+                                                                            size={24}
+                                                                            sx={{ color: '#fff' }} /> : <i>
+                                                                            <UserPlus className="text-gray-800 w-6 h-6" />
+                                                                        </i>
+                                                                }
                                                                 <span className="text-base font-medium">Reject friend</span>
                                                             </div>
                                                         </button>
@@ -155,14 +252,46 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
                                                 }
                                             </>
                                         }
-                                        {statusFriend?.status === 1 && <button className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]">
-                                            <div className="flex items-center gap-x-3">
-                                                <i>
-                                                    <UserCheck className="text-black w-6 h-6" />
-                                                </i>
-                                                <span className="text-base font-medium">Friend</span>
-                                            </div>
-                                        </button>}
+                                        {statusFriend?.status === 1 &&
+                                            <TippyHeadless
+                                                interactive
+                                                placement="top-start"
+                                                offset={[-10, 5]}
+                                                visible={openOptionFriended}
+                                                render={(attrs) => (
+                                                    <div {...attrs}>
+                                                        <div className="w-[200px] max-h-[calc(min((100vh-96px)-60px),734px)] min-h-[30px] py-2 rounded-md shadow-md bg-white">
+                                                            <div className='px-2 py-1'>
+                                                                <div className='px-2 py-2 rounded-md  cursor-pointer hover:bg-gray-200' onClick={handleUnfriend}>
+                                                                    <div className='flex gap-x-2 '>
+                                                                        {
+                                                                            (publicProfileState.statusDeleteFriend !== "idle" &&
+                                                                                publicProfileState.statusDeleteFriend === "loading") ?
+                                                                                <CircularProgress
+                                                                                    size={24}
+                                                                                    sx={{ color: '#fff' }} /> :
+                                                                                <i>
+                                                                                    <UserPlus className="text-gray-800 w-6 h-6" />
+                                                                                </i>
+                                                                        }
+                                                                        <span className="text-base font-medium">Unfriend</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                onClickOutside={handleCloseFriended}
+                                            >
+                                                <button type='button' className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]"><div className="flex items-center gap-x-3" onClick={handleToggleOpenFriended}>
+                                                    <i>
+                                                        <UserCheck className="text-black w-6 h-6" />
+                                                    </i>
+                                                    <span className="text-base font-medium">Friend</span>
+                                                </div>
+                                                </button>
+                                            </TippyHeadless>
+                                        }
                                     </div>
                                 }
                             </div>
@@ -249,12 +378,6 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
                     open={publicProfileState?.status === "loading"}
-                >
-                    <CircularProgress color="inherit" />
-                </Backdrop>
-                <Backdrop
-                    sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
-                    open={publicProfileState?.statusAddFriendStatus === "loading"}
                 >
                     <CircularProgress color="inherit" />
                 </Backdrop>

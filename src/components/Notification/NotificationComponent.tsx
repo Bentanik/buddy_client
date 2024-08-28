@@ -4,6 +4,10 @@ import { useAppDispatch, useAppSelector } from "@/stores/store";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import TippyHeadless from "@tippyjs/react/headless";
+import ViewAddFriendNotification from "@/components/Notification/ViewAddFriendNotification";
+import styles from "@/components/Notification/Notification.module.css";
+
 
 export default function NotificationComponent() {
     const userState = useAppSelector(state => state.userSlice);
@@ -12,6 +16,19 @@ export default function NotificationComponent() {
     const dispatch = useAppDispatch();
 
     const [connection, setConnection] = useState<any>(null);
+    const [openPopup, setOpenPopup] = useState<boolean>(false);
+
+    const handleOpenPopup = () => {
+        setOpenPopup(true);
+    }
+
+    const handleTogglePopup = () => {
+        setOpenPopup(prev => !prev);
+    }
+
+    const handleClosePopup = () => {
+        setOpenPopup(false);
+    }
 
     const createConnection = async () => {
         const newConnection = new HubConnectionBuilder()
@@ -29,6 +46,7 @@ export default function NotificationComponent() {
 
     useEffect(() => {
         createConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -63,12 +81,38 @@ export default function NotificationComponent() {
         }
     }, [connection]);
 
+
     return (
-        <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300 relative">
-            <Bell className="text-gray-500 group-hover:text-gray-800" />
-            {notificationState.countNotification !== 0 && <div className="absolute top-1 right-0 translate-x-1/2 -translate-y-1/2 w-7 h-7 bg-purple-500 rounded-md inline-flex items-center justify-center">
-                <span className="text-[13px] text-gray-200">{notificationState.countNotification}</span>
-            </div>}
-        </div>
+        <TippyHeadless
+            interactive
+            placement="bottom-start"
+            offset={[90, 3]}
+            visible={openPopup}
+            render={(attrs) => (
+                <div {...attrs}>
+                    <div className="w-[350px] max-h-[calc(min((100vh-96px)-60px),734px)] min-h-[30px] py-2 rounded-md shadow-avatar-shadown bg-white">
+                        <div className="py-2">
+                            <h3 className="px-3 text-xl font-bold">
+                                Notification
+                            </h3>
+                            <div className={`h-[80vh] overflow-y-auto ${styles.notification}`}>
+                                <div className="px-3">
+                                    <ViewAddFriendNotification open={openPopup} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            onClickOutside={handleClosePopup}
+        >
+            <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300 relative" onClick={handleTogglePopup}>
+
+                <Bell className="text-gray-500 group-hover:text-gray-800" />
+                {notificationState.countNotification !== 0 && <div className="absolute top-1 right-0 translate-x-1/2 -translate-y-1/2 w-7 h-7 bg-purple-500 rounded-md inline-flex items-center justify-center">
+                    <span className="text-[13px] text-gray-200">{notificationState.countNotification}</span>
+                </div>}
+            </div>
+        </TippyHeadless >
     )
 }
