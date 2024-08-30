@@ -29,10 +29,14 @@ export default function Notification({ children }: { children: React.ReactNode }
 
     const handleAcceptFriend = async () => {
         try {
-            await dispatch(putAcceptFriendThunk({
-                userReceiveId: publicProfileState.data.userId
-            })).unwrap();
+            if (notificationFriendState?.userId) {
+                await dispatch(putAcceptFriendThunk({
+                    userReceiveId: notificationFriendState?.userId
+                })).unwrap();
+                handleCloseNotification();
+            }
         } catch (err) {
+            handleCloseNotification();
             const errors = err as ErrorResponse[];
 
             if (errors && errors[0]?.errorCode === "adfr03") {
@@ -40,22 +44,24 @@ export default function Notification({ children }: { children: React.ReactNode }
             }
             return err;
         }
-        handleCloseNotification();
     }
 
     const handleRejectFriend = async () => {
         try {
-            await dispatch(putRejectFriendThunk({
-                userReceiveId: publicProfileState.data.userId
-            })).unwrap();
+            if (notificationFriendState?.userId) {
+                await dispatch(putRejectFriendThunk({
+                    userReceiveId: publicProfileState.data.userId
+                })).unwrap();
+                handleCloseNotification();
+            }
         } catch (err) {
+            handleCloseNotification();
             const errors = err as ErrorResponse[];
             if (errors && errors[0]?.errorCode === "adfr03") {
                 window.location.reload()
             }
             return err;
         }
-        handleCloseNotification();
     }
 
     return (

@@ -35,10 +35,10 @@ export default function ViewAddFriendNotification({ open }: ViewAddFriendNotific
         }
     }, [open])
 
-    const handleAcceptFriend = async () => {
+    const handleAcceptFriend = async (user: any) => {
         try {
             await dispatch(putAcceptFriendThunk({
-                userReceiveId: publicProfileState.data.userId
+                userReceiveId: user?.data?.userId
             })).unwrap();
             fetchNotificationFriend();
         } catch (err) {
@@ -51,10 +51,10 @@ export default function ViewAddFriendNotification({ open }: ViewAddFriendNotific
         }
     }
 
-    const handleRejectFriend = async () => {
+    const handleRejectFriend = async (user: any) => {
         try {
             await dispatch(putRejectFriendThunk({
-                userReceiveId: publicProfileState.data.userId
+                userReceiveId: user?.data?.userId
             })).unwrap();
             fetchNotificationFriend();
         } catch (err) {
@@ -82,11 +82,11 @@ export default function ViewAddFriendNotification({ open }: ViewAddFriendNotific
                     <span className="font-semibold">{user?.data?.fullName}{" "}</span>
                     has sent you a friend request.</p>
                 <div className="flex gap-x-3">
-                    <button className="w-1/2 h-8 rounded-md bg-blue-600 hover:bg-blue-700" onClick={handleAcceptFriend}>
+                    <button className="w-1/2 h-8 rounded-md bg-blue-600 hover:bg-blue-700" onClick={() => handleAcceptFriend(user)}>
                         <span className="text-[15px] text-white">Confirm</span>
                     </button>
                     <button className="w-1/2 h-8 rounded-md bg-red-400 
-                hover:bg-red-500 group:" onClick={handleRejectFriend}>
+                hover:bg-red-500 group:" onClick={() => handleRejectFriend(user)}>
                         <span className="text-[15px] text-white">Reject</span>
                     </button>
                 </div>
