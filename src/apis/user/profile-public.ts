@@ -17,3 +17,9 @@ export const GetNineImagesApi = (form: any) => {
     `/api/profile/get_nine_images?userId=${form.userId}`
   );
 };
+
+export const GetNineFriendsApi = (form: any) => {
+  return axiosInstance.get(
+    `/api/profile/get_nine_friends?userId=${form.userId}`
+  );
+};

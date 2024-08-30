@@ -32,6 +32,7 @@ const config: Config = {
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
+        matemasie: ["Matemasie", "sans-serif"],
       },
     },
   },

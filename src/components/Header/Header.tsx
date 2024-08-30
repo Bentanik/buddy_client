@@ -2,7 +2,7 @@
 import { logoutUser } from "@/stores/authSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
 import { Backdrop, CircularProgress, Skeleton } from "@mui/material";
-import { Bell, Bookmark, MessageCircleMore } from "lucide-react";
+import {  Bookmark } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TippyHeadless from "@tippyjs/react/headless";
@@ -40,7 +40,7 @@ export default function HeaderComponent() {
     return (
         <header className="px-3 flex flex-row items-center gap-x-5 justify-between shadow-header-shadown bg-white">
             <section className="basis-1/5">
-                <h1 className="inline-block text-3xl font-mono font-normal text-blue-500 cursor-pointer" onClick={navigateHome}>Buddy</h1>
+                <h1 className="inline-block text-4xl font-matemasie font-normal text-blue-500 cursor-pointer" onClick={navigateHome}>Buddy</h1>
             </section>
             <section className="basis-2/4">
                 <SearchComponent />

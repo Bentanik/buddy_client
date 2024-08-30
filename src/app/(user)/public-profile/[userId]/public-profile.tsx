@@ -2,7 +2,7 @@
 'use client'
 import HeaderComponent from '@/components/Header/Header'
 import TextViewMore from '@/components/TextViewMore/TextViewMore'
-import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, putAcceptFriendThunk, postAddFriendThunk, putRejectFriendThunk, deleteUnfriendThunk, getNumbersOfFriendThunk } from '@/stores/publicUserProfileSlice'
+import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, putAcceptFriendThunk, postAddFriendThunk, putRejectFriendThunk, deleteUnfriendThunk, getNumbersOfFriendThunk, getNineImagesThunk, getNineFriendsThunk } from '@/stores/publicUserProfileSlice'
 import { useAppDispatch, useAppSelector } from '@/stores/store'
 import { Backdrop, CircularProgress } from '@mui/material'
 import { GraduationCap, UserCheck, UserPlus, UserX } from 'lucide-react'
@@ -31,6 +31,8 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
     const [statusFriend, setStatusFriend] = useState<StatusFriendProps | null>(null);
 
     const [openOptionFriended, setOpenFriended] = useState(false);
+    const [listImages, setListImages] = useState<any>(null);
+    const [listFriends, setListFriends] = useState<any>(null);
 
     const handleToggleOpenFriended = () => setOpenFriended(prev => !prev);
 
@@ -68,10 +70,34 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
         }
     }
 
+    const fetchNineImagesProfile = async () => {
+        try {
+            const res = await dispatch(getNineImagesThunk({
+                userId: userId
+            })).unwrap();
+            setListImages(res?.data);
+        } catch (err) {
+            return err;
+        }
+    }
+
+    const fetchNineFriendsProfile = async () => {
+        try {
+            const res = await dispatch(getNineFriendsThunk({
+                userId: userId
+            })).unwrap();
+            setListFriends(res?.data);
+        } catch (err) {
+            return err;
+        }
+    }
+
     useEffect(() => {
         fetchUserProfile();
         fetchNumbersOfFriendProfile();
         fetchStatusFriendUserProfile();
+        fetchNineImagesProfile();
+        fetchNineFriendsProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -153,6 +179,33 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
             }
             return err;
         }
+    }
+
+    const BoxImages = (data: any) => {
+        return <div className="h-[128px] flex items-center justify-center border border-gray-100 shadow-lg">
+            <img src={data?.data} alt="Image" className="w-full h-full object-cover" />
+        </div>
+    }
+
+    const ListBoxImages = () => {
+        return listImages?.map((item: any, index: number) => {
+            return <BoxImages data={item} key={index} />
+        })
+    }
+
+    const BoxFriends = (data: any) => {
+        return <Link href={`/public-profile/${data?.data?.userId}`}> <div className="flex flex-col items-start gap-y-2 w-full">
+            <div className="w-full h-[120px] flex items-center justify-center">
+                <img src={data?.data?.cropAvatar} alt="Image" className="w-[123px] h-full object-cover rounded-lg" />
+            </div>
+            <h3 className="font-sans text-[12px] font-semibold">{data?.data?.fullName}</h3>
+        </div>
+        </Link>
+    }
+    const ListBoxFriends = () => {
+        return listFriends?.map((item: any, index: number) => {
+            return <BoxFriends data={item} key={index} />
+        })
     }
 
     return (
@@ -330,29 +383,29 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
                                     </div>
                                 </div>
                                 <div className="w-full p-[15px] rounded-lg shadow-box-shadown break-words mt-[30px]">
-                                    <div className="flex justify-between">
+                                    <div className="flex items-center justify-between">
                                         <h3 className="text-[17px] font-semibold">Images</h3>
                                         <Link href="#!">
-                                            <span>View more</span>
+                                            <div className="px-2 py-2 hover:bg-slate-200 rounded-lg">
+                                                <span className="text-base text-[#0064d1] font-light">View more</span>
+                                            </div>
                                         </Link>
                                     </div>
-                                    <div className="py-3">
-                                        <button className="text-center w-full bg-[#e4e6eb] p-2 rounded-lg hover:bg-[#d9dae0]">
-                                            <span className="text-base font-semibold">Add biography</span>
-                                        </button>
-                                        <div className="flex flex-col gap-y-3 py-3 ">
-                                            <div className="flex items-center flex-row gap-x-3">
-                                                <i><GraduationCap className="w-8 h-8" /></i>
-                                                <span className="text-base font-normal">Learn at Nguyen Mai Viet Vy</span>
+                                    <div className="py-3 grid grid-cols-3 grid-rows-3 gap-x-1 gap-y-1">
+                                        {ListBoxImages()}
+                                    </div>
+                                </div>
+                                <div className="w-full p-[15px] rounded-lg shadow-box-shadown break-words mt-[30px]">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-[17px] font-semibold">Friends</h3>
+                                        <Link href="#!">
+                                            <div className="px-2 py-2 hover:bg-slate-200 rounded-lg">
+                                                <span className="text-base text-[#0064d1] font-light">View more</span>
                                             </div>
-                                            <div className="flex items-center flex-row gap-x-3">
-                                                <i><GraduationCap className="w-8 h-8" /></i>
-                                                <span className="text-base font-normal">Learn at Nguyen Mai Viet Vy</span>
-                                            </div>
-                                        </div>
-                                        <button className="text-center w-full bg-[#e4e6eb] p-2 rounded-lg hover:bg-[#d9dae0]">
-                                            <span className="text-base font-semibold">Edit detail</span>
-                                        </button>
+                                        </Link>
+                                    </div>
+                                    <div className="py-3 grid grid-cols-3 grid-rows-3 gap-x-2 gap-y-3">
+                                        {ListBoxFriends()}
                                     </div>
                                 </div>
                             </section>

@@ -1,4 +1,5 @@
 import {
+  GetNineFriendsApi,
   GetNineImagesApi,
   GetNumbersOfFriendApi,
   GetProfilePublicApi,
@@ -21,7 +22,10 @@ export interface GetStatusFriendData {
 export interface GetNumbersOfFriendData {
   userId: string;
 }
-export interface GetNineImageData {
+export interface GetNineImagesData {
+  userId: string;
+}
+export interface GetNineFriendsData {
   userId: string;
 }
 export interface PostStatusFriendData {
@@ -51,6 +55,7 @@ export interface InitialState {
   statusGetFriendStatus?: string;
   statusGetNumbersOfFriend?: string;
   statusGetNineImages?: string;
+  statusGetNineFriends?: string;
   statusAcceptFriend?: string;
   statusRejectFriend?: string;
   statusDeleteFriend?: string;
@@ -64,6 +69,7 @@ let initialState: InitialState = {
   statusGetFriendStatus: "idle",
   statusGetNumbersOfFriend: "idle",
   statusGetNineImages: "idle",
+  statusGetNineFriends: "idle",
   statusAcceptFriend: "idle",
   statusRejectFriend: "idle",
   statusDeleteFriend: "idle",
@@ -124,9 +130,24 @@ export const getNumbersOfFriendThunk = createAsyncThunk(
 
 export const getNineImagesThunk = createAsyncThunk(
   "user/getNineImages",
-  async (data: GetNineImageData, { rejectWithValue }) => {
+  async (data: GetNineImagesData, { rejectWithValue }) => {
     try {
       const response = await GetNineImagesApi(data);
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
+
+export const getNineFriendsThunk = createAsyncThunk(
+  "user/GetNineFriends",
+  async (data: GetNineFriendsData, { rejectWithValue }) => {
+    try {
+      const response = await GetNineFriendsApi(data);
       if (response?.data?.error === 1) {
         return rejectWithValue(response?.data?.data as ErrorResponse[]);
       }
@@ -311,6 +332,17 @@ const publicUserProfileSlice = createSlice({
       })
       .addCase(getNineImagesThunk.rejected, (state, action) => {
         state.statusGetNineImages = "failed";
+        state.error = action.payload as ErrorResponse[];
+      })
+      //  ======================
+      .addCase(getNineFriendsThunk.pending, (state) => {
+        state.statusGetNineFriends = "loading";
+      })
+      .addCase(getNineFriendsThunk.fulfilled, (state) => {
+        state.statusGetNineFriends = "succeeded";
+      })
+      .addCase(getNineFriendsThunk.rejected, (state, action) => {
+        state.statusGetNineFriends = "failed";
         state.error = action.payload as ErrorResponse[];
       });
   },

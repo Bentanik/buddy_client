@@ -3,7 +3,7 @@
 import HeaderComponent from "@/components/Header/Header";
 import { GraduationCap, Pencil } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import HomeUploadPost from "@/components/HomeUploadPost/HomeUploadPost";
 import TextViewMore from "@/components/TextViewMore/TextViewMore";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import PostStatus from "@/components/PostStatus/PostStatus";
 import AvatarProfile from "@/components/AvatarProfile/AvatarProfile";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
 import UpdateCoverPhoto from "@/components/UpdateCoverPhoto/UpdateCoverPhoto";
-import { getNineImagesThunk, getNumbersOfFriendThunk, getProfileUserThunk } from "@/stores/publicUserProfileSlice";
+import { getNineFriendsThunk, getNineImagesThunk, getNumbersOfFriendThunk, getProfileUserThunk } from "@/stores/publicUserProfileSlice";
 import { Backdrop, CircularProgress } from "@mui/material";
 
 
@@ -60,6 +60,7 @@ export default function ProfileComponent() {
 
     const [postStatus, setPostStatus] = useState(false);
     const [listImages, setListImages] = useState<any>(null);
+    const [listFriends, setListFriends] = useState<any>(null);
 
     const handleOpenPostStatus = () => {
         setPostStatus(true);
@@ -100,10 +101,22 @@ export default function ProfileComponent() {
         }
     }
 
+    const fetchNineFriendsProfile = async () => {
+        try {
+            const res = await dispatch(getNineFriendsThunk({
+                userId: userState.user?.id ?? ""
+            })).unwrap();
+            setListFriends(res?.data);
+        } catch (err) {
+            return err;
+        }
+    }
+
     useEffect(() => {
         fetchUserProfile();
         fetchNumbersOfFriendProfile();
         fetchNineImagesProfile();
+        fetchNineFriendsProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -116,6 +129,22 @@ export default function ProfileComponent() {
     const ListBoxImages = () => {
         return listImages?.map((item: any, index: number) => {
             return <BoxImages data={item} key={index} />
+        })
+    }
+
+    const BoxFriends = (data: any) => {
+        return <Link href={`/public-profile/${data?.data?.userId}`}> <div className="flex flex-col items-start gap-y-2 w-full">
+            <div className="w-full h-[120px] flex items-center justify-center">
+                <img src={data?.data?.cropAvatar} alt="Image" className="w-[123px] h-full object-cover rounded-lg" />
+            </div>
+            <h3 className="font-sans text-[12px] font-semibold hover:underline">{data?.data?.fullName}</h3>
+        </div>
+        </Link>
+    }
+
+    const ListBoxFriends = () => {
+        return listFriends?.map((item: any, index: number) => {
+            return <BoxFriends data={item} key={index} />
         })
     }
 
@@ -155,7 +184,7 @@ export default function ProfileComponent() {
                 <main className="relative pt-5 px-3">
                     <div className="max-w-[1120px] mx-auto">
                         <div className='w-full flex flex-row items-start gap-x-5'>
-                            <section className="sticky basis-1/3 top-[84px] z-20 w-[20%]">
+                            <section className="pb-3 sticky basis-1/3 top-[84px] z-20 w-[20%]">
                                 <div className="w-full p-[15px] rounded-lg shadow-box-shadown break-words">
                                     <h3 className="text-[17px] font-semibold">Introduction</h3>
                                     <div className="py-3">
@@ -199,12 +228,12 @@ export default function ProfileComponent() {
                                             </div>
                                         </Link>
                                     </div>
-                                    <div className="py-3 grid grid-cols-3 grid-rows-3 gap-x-1 gap-y-1">
-                                        {ListBoxImages()}
+                                    <div className="py-3 grid grid-cols-3 grid-rows-3 gap-x-2 gap-y-3">
+                                        {ListBoxFriends()}
                                     </div>
                                 </div>
                             </section>
-                            <section className="flex-1 z-10 flex flex-col gap-y-8">
+                            <section className="pb-3 flex-1 z-10 flex flex-col gap-y-8">
                                 <div className="w-full p-[15px] rounded-lg shadow-box-shadown break-words">
                                     <HomeUploadPost onClickPopup={handleOpenPostStatus} />
                                 </div>
