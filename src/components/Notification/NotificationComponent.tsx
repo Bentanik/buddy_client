@@ -12,7 +12,7 @@ import styles from "@/components/Notification/Notification.module.css";
 export default function NotificationComponent() {
     const userState = useAppSelector(state => state.userSlice);
     const notificationState = useAppSelector(state => state.notificationSlice);
-
+    
     const dispatch = useAppDispatch();
 
     const [connection, setConnection] = useState<any>(null);

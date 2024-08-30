@@ -52,18 +52,17 @@ export default function UpdateAvatarProfilePopup({ open, onClose }: UpdateAvatar
     }
 
     const handleSubmit = async (base64UrlImage: any) => {
+        const fullFileAvatar = await convertBase64ToFile(avatarSrc, `fullFile_avatar_${userState?.user?.id}.jpg`)
 
-        const fullFileAvatar = await convertBase64ToFile(avatarSrc, `fullFile_avatar_${userState?.user?.id}`)
-
-        const cropAvatarFile = await convertBase64ToFile(base64UrlImage, `crop_avatar_${userState?.user?.id}`)
+        const cropAvatarFile = await convertBase64ToFile(base64UrlImage, `crop_avatar_${userState?.user?.id}.jpg`)
 
         try {
-            const res = await dispatch(updateAvatarThunk({
+            await dispatch(updateAvatarThunk({
                 oldFileName: userState.user?.avatar ?? "",
-                fileName: `avatar_${userState?.user?.id}`,
+                fileName: `avatar`,
                 cropFileAvatar: cropAvatarFile,
                 fullFileAvatar: fullFileAvatar,
-            })).unwrap();
+            }));
             handleCloseUpdateAvatar();
             if (fileInputRef.current) {
                 fileInputRef.current.value = ''; // Xóa phần tử input

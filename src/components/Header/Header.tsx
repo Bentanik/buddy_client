@@ -9,6 +9,7 @@ import TippyHeadless from "@tippyjs/react/headless";
 import MenuAvatarHeader from "@/components/MenuAvatar/MenuAvatarHeader";
 import SearchComponent from "@/components/Search/SearchComponent";
 import NotificationComponent from "@/components/Notification/NotificationComponent";
+import MessageComponent from "@/components/Message/MessageComponent";
 
 export default function HeaderComponent() {
     const router = useRouter();
@@ -48,9 +49,7 @@ export default function HeaderComponent() {
                 <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300">
                     <Bookmark className="text-gray-500 group-hover:text-gray-800" />
                 </div>
-                <div className="group h-max inline-flex items-center py-2 px-3 bg-blue-100 rounded-lg select-none cursor-pointer hover:bg-blue-300">
-                    <MessageCircleMore className="text-gray-500 group-hover:text-gray-800" />
-                </div>
+                <div> <MessageComponent /></div>
                 <div>
                     <NotificationComponent />
                 </div>

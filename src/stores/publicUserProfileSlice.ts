@@ -1,4 +1,8 @@
-import { GetProfilePublicApi } from "@/apis/user/profile-public";
+import {
+  GetNineImagesApi,
+  GetNumbersOfFriendApi,
+  GetProfilePublicApi,
+} from "@/apis/user/profile-public";
 import {
   GetStatusFriendApi,
   PutAcceptFriendApi,
@@ -14,6 +18,12 @@ export interface GetProfileUserData {
 export interface GetStatusFriendData {
   userId: string;
 }
+export interface GetNumbersOfFriendData {
+  userId: string;
+}
+export interface GetNineImageData {
+  userId: string;
+}
 export interface PostStatusFriendData {
   userId: string;
 }
@@ -26,6 +36,7 @@ export interface DataProfile {
   fullName: string;
   cropCoverPhoto?: string;
   cropAvatar?: string;
+  numbersOfFriend?: number;
 }
 
 export interface ErrorResponse {
@@ -38,6 +49,8 @@ export interface InitialState {
   status: string;
   statusAddFriendStatus?: string;
   statusGetFriendStatus?: string;
+  statusGetNumbersOfFriend?: string;
+  statusGetNineImages?: string;
   statusAcceptFriend?: string;
   statusRejectFriend?: string;
   statusDeleteFriend?: string;
@@ -49,6 +62,8 @@ let initialState: InitialState = {
   status: "idle",
   statusAddFriendStatus: "idle",
   statusGetFriendStatus: "idle",
+  statusGetNumbersOfFriend: "idle",
+  statusGetNineImages: "idle",
   statusAcceptFriend: "idle",
   statusRejectFriend: "idle",
   statusDeleteFriend: "idle",
@@ -58,6 +73,7 @@ let initialState: InitialState = {
     fullName: "",
     cropCoverPhoto: "",
     cropAvatar: "",
+    numbersOfFriend: 0,
   },
 };
 
@@ -81,6 +97,36 @@ export const getStatusFriendThunk = createAsyncThunk(
   async (data: GetStatusFriendData, { rejectWithValue }) => {
     try {
       const response = await GetStatusFriendApi(data);
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
+
+export const getNumbersOfFriendThunk = createAsyncThunk(
+  "user/getNumbersOfFriend",
+  async (data: GetNumbersOfFriendData, { rejectWithValue }) => {
+    try {
+      const response = await GetNumbersOfFriendApi(data);
+      if (response?.data?.error === 1) {
+        return rejectWithValue(response?.data?.data as ErrorResponse[]);
+      }
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err?.response?.data?.data as ErrorResponse[]);
+    }
+  }
+);
+
+export const getNineImagesThunk = createAsyncThunk(
+  "user/getNineImages",
+  async (data: GetNineImageData, { rejectWithValue }) => {
+    try {
+      const response = await GetNineImagesApi(data);
       if (response?.data?.error === 1) {
         return rejectWithValue(response?.data?.data as ErrorResponse[]);
       }
@@ -189,7 +235,7 @@ const publicUserProfileSlice = createSlice({
         state.status = "failed";
         state.error = action.payload as ErrorResponse[];
       })
-      // =======================
+      //  ======================
       .addCase(getStatusFriendThunk.pending, (state) => {
         state.statusGetFriendStatus = "loading";
       })
@@ -198,6 +244,18 @@ const publicUserProfileSlice = createSlice({
       })
       .addCase(getStatusFriendThunk.rejected, (state, action) => {
         state.statusGetFriendStatus = "failed";
+        state.error = action.payload as ErrorResponse[];
+      })
+      //  ======================
+      .addCase(getNumbersOfFriendThunk.pending, (state) => {
+        state.statusGetNumbersOfFriend = "loading";
+      })
+      .addCase(getNumbersOfFriendThunk.fulfilled, (state, action) => {
+        state.statusGetNumbersOfFriend = "succeeded";
+        state.data.numbersOfFriend = action.payload?.data;
+      })
+      .addCase(getNumbersOfFriendThunk.rejected, (state, action) => {
+        state.statusGetNumbersOfFriend = "failed";
         state.error = action.payload as ErrorResponse[];
       })
       //  ======================
@@ -242,6 +300,17 @@ const publicUserProfileSlice = createSlice({
       })
       .addCase(deleteUnfriendThunk.rejected, (state, action) => {
         state.statusDeleteFriend = "failed";
+        state.error = action.payload as ErrorResponse[];
+      })
+      //  ======================
+      .addCase(getNineImagesThunk.pending, (state) => {
+        state.statusGetNineImages = "loading";
+      })
+      .addCase(getNineImagesThunk.fulfilled, (state) => {
+        state.statusGetNineImages = "succeeded";
+      })
+      .addCase(getNineImagesThunk.rejected, (state, action) => {
+        state.statusGetNineImages = "failed";
         state.error = action.payload as ErrorResponse[];
       });
   },

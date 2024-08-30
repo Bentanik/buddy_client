@@ -11,7 +11,7 @@ import PostStatus from "@/components/PostStatus/PostStatus";
 import AvatarProfile from "@/components/AvatarProfile/AvatarProfile";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
 import UpdateCoverPhoto from "@/components/UpdateCoverPhoto/UpdateCoverPhoto";
-import { getProfileUserThunk } from "@/stores/publicUserProfileSlice";
+import { getNineImagesThunk, getNumbersOfFriendThunk, getProfileUserThunk } from "@/stores/publicUserProfileSlice";
 import { Backdrop, CircularProgress } from "@mui/material";
 
 
@@ -51,14 +51,15 @@ Thế hệ Z các bạn – thế hệ phải cạnh tranh bằng sự khác bi�
 Theo Trí Thức Trẻ.
 HN, 06/08/2024.`
 
+const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 export default function ProfileComponent() {
     const dispatch = useAppDispatch();
     const userState = useAppSelector(state => state.userSlice);
     const publicProfileState = useAppSelector(state => state.publicUserProfileSlice);
 
-    const soloRef = useRef<HTMLDivElement>(null);
     const [postStatus, setPostStatus] = useState(false);
-
+    const [listImages, setListImages] = useState<any>(null);
 
     const handleOpenPostStatus = () => {
         setPostStatus(true);
@@ -78,10 +79,45 @@ export default function ProfileComponent() {
         }
     }
 
+    const fetchNumbersOfFriendProfile = () => {
+        try {
+            dispatch(getNumbersOfFriendThunk({
+                userId: userState.user?.id ?? ""
+            }))
+        } catch (err) {
+            return err;
+        }
+    }
+
+    const fetchNineImagesProfile = async () => {
+        try {
+            const res = await dispatch(getNineImagesThunk({
+                userId: userState.user?.id ?? ""
+            })).unwrap();
+            setListImages(res?.data);
+        } catch (err) {
+            return err;
+        }
+    }
+
     useEffect(() => {
         fetchUserProfile();
+        fetchNumbersOfFriendProfile();
+        fetchNineImagesProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    const BoxImages = (data: any) => {
+        return <div className="h-[128px] flex items-center justify-center border border-gray-100 shadow-lg">
+            <img src={data?.data} alt="Image" className="w-full h-full object-cover" />
+        </div>
+    }
+
+    const ListBoxImages = () => {
+        return listImages?.map((item: any, index: number) => {
+            return <BoxImages data={item} key={index} />
+        })
+    }
 
     return (
         <div>
@@ -100,7 +136,7 @@ export default function ProfileComponent() {
 
                                 <div className="inline-block">
                                     <h2 className="text-2xl font-semibold font-poppins">{publicProfileState.data.fullName}</h2>
-                                    <p className="mt-[3px] text-base text-gray-600">100 friends</p>
+                                    <p className="mt-[3px] text-base text-gray-600">{publicProfileState.data.numbersOfFriend} friends</p>
                                 </div>
                             </div>
                             <div className="-translate-y-4">
@@ -142,29 +178,29 @@ export default function ProfileComponent() {
                                     </div>
                                 </div>
                                 <div className="w-full p-[15px] rounded-lg shadow-box-shadown break-words mt-[30px]">
-                                    <div className="flex justify-between">
+                                    <div className="flex items-center justify-between">
                                         <h3 className="text-[17px] font-semibold">Images</h3>
                                         <Link href="#!">
-                                            <span>View more</span>
+                                            <div className="px-2 py-2 hover:bg-slate-200 rounded-lg">
+                                                <span className="text-base text-[#0064d1] font-light">View more</span>
+                                            </div>
                                         </Link>
                                     </div>
-                                    <div className="py-3">
-                                        <button className="text-center w-full bg-[#e4e6eb] p-2 rounded-lg hover:bg-[#d9dae0]">
-                                            <span className="text-base font-semibold">Add biography</span>
-                                        </button>
-                                        <div className="flex flex-col gap-y-3 py-3 ">
-                                            <div className="flex items-center flex-row gap-x-3">
-                                                <i><GraduationCap className="w-8 h-8" /></i>
-                                                <span className="text-base font-normal">Learn at Nguyen Mai Viet Vy</span>
+                                    <div className="py-3 grid grid-cols-3 grid-rows-3 gap-x-1 gap-y-1">
+                                        {ListBoxImages()}
+                                    </div>
+                                </div>
+                                <div className="w-full p-[15px] rounded-lg shadow-box-shadown break-words mt-[30px]">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-[17px] font-semibold">Friends</h3>
+                                        <Link href="#!">
+                                            <div className="px-2 py-2 hover:bg-slate-200 rounded-lg">
+                                                <span className="text-base text-[#0064d1] font-light">View more</span>
                                             </div>
-                                            <div className="flex items-center flex-row gap-x-3">
-                                                <i><GraduationCap className="w-8 h-8" /></i>
-                                                <span className="text-base font-normal">Learn at Nguyen Mai Viet Vy</span>
-                                            </div>
-                                        </div>
-                                        <button className="text-center w-full bg-[#e4e6eb] p-2 rounded-lg hover:bg-[#d9dae0]">
-                                            <span className="text-base font-semibold">Edit detail</span>
-                                        </button>
+                                        </Link>
+                                    </div>
+                                    <div className="py-3 grid grid-cols-3 grid-rows-3 gap-x-1 gap-y-1">
+                                        {ListBoxImages()}
                                     </div>
                                 </div>
                             </section>

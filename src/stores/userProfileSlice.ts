@@ -48,7 +48,6 @@ export interface DataUpdateAvatar {
 
 export interface DataUpdateCoverPhoto {
   oldFileName: string;
-  fileName: string;
   cropFileCoverPhoto: File;
   fullFileCoverPhoto: File;
 }
@@ -198,7 +197,6 @@ export const updateCoverPhotoThunk = createAsyncThunk(
     dispatch(clearCoverPhotoUser());
     try {
       let formData = new FormData();
-      formData.append("fileName", data.fileName);
       formData.append("cropFileCoverPhoto", data.cropFileCoverPhoto);
       formData.append("fullFileCoverPhoto", data.fullFileCoverPhoto);
 

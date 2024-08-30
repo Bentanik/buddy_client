@@ -47,17 +47,16 @@ export default function UpdateCoverPhoto() {
     }
 
     const handleSubmit = async (base64UrlImage: any) => {
-        const fullFileCoverPhoto = await convertBase64ToFile(coverPhotoSrc, `fullFile_coverphoto_${userState?.user?.id}`)
+        const fullFileCoverPhoto = await convertBase64ToFile(coverPhotoSrc, `fullFile_coverphoto_${userState?.user?.id}.jpg`)
 
-        const cropFileCoverPhoto = await convertBase64ToFile(base64UrlImage, `crop_coverphoto_${userState?.user?.id}`)
+        const cropFileCoverPhoto = await convertBase64ToFile(base64UrlImage, `crop_coverphoto_${userState?.user?.id}.jpg`)
 
         try {
-            const res = await dispatch(updateCoverPhotoThunk({
+            await dispatch(updateCoverPhotoThunk({
                 oldFileName: userState.user?.avatar ?? "",
-                fileName: `avatar_${userState?.user?.id}`,
                 cropFileCoverPhoto: cropFileCoverPhoto,
                 fullFileCoverPhoto: fullFileCoverPhoto,
-            })).unwrap();
+            }));
             handleCloseUpdateCoverPhoto();
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';

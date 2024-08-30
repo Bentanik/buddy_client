@@ -2,7 +2,7 @@
 'use client'
 import HeaderComponent from '@/components/Header/Header'
 import TextViewMore from '@/components/TextViewMore/TextViewMore'
-import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, putAcceptFriendThunk, postAddFriendThunk, putRejectFriendThunk, deleteUnfriendThunk } from '@/stores/publicUserProfileSlice'
+import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, putAcceptFriendThunk, postAddFriendThunk, putRejectFriendThunk, deleteUnfriendThunk, getNumbersOfFriendThunk } from '@/stores/publicUserProfileSlice'
 import { useAppDispatch, useAppSelector } from '@/stores/store'
 import { Backdrop, CircularProgress } from '@mui/material'
 import { GraduationCap, UserCheck, UserPlus, UserX } from 'lucide-react'
@@ -58,8 +58,19 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
         }
     }
 
+    const fetchNumbersOfFriendProfile = async () => {
+        try {
+            await dispatch(getNumbersOfFriendThunk({
+                userId: userId
+            }))
+        } catch (err) {
+            return err;
+        }
+    }
+
     useEffect(() => {
         fetchUserProfile();
+        fetchNumbersOfFriendProfile();
         fetchStatusFriendUserProfile();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -83,18 +94,21 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
     useEffect(() => {
         if (publicProfileState.statusAcceptFriend !== "idle" && publicProfileState.statusAcceptFriend !== "loading") {
             fetchStatusFriendUserProfile();
+            fetchNumbersOfFriendProfile();
         }
     }, [publicProfileState.statusAcceptFriend])
 
     useEffect(() => {
         if (publicProfileState.statusRejectFriend !== "idle" && publicProfileState.statusRejectFriend !== "loading") {
             fetchStatusFriendUserProfile();
+            fetchNumbersOfFriendProfile();
         }
     }, [publicProfileState.statusRejectFriend])
 
     useEffect(() => {
         if (publicProfileState.statusDeleteFriend !== "idle" && publicProfileState.statusDeleteFriend !== "loading") {
             fetchStatusFriendUserProfile();
+            fetchNumbersOfFriendProfile();
         }
     }, [publicProfileState.statusDeleteFriend])
 
@@ -117,11 +131,10 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
         try {
             await dispatch(putRejectFriendThunk({
                 userReceiveId: publicProfileState.data.userId
-            })).unwrap();
+            }));
         } catch (err) {
             const errors = err as ErrorResponse[];
-            if (errors && errors[0]?.errorCode === "adfr03") {
-                window.location.reload()
+            if (errors && errors[0]?.errorCode === "adfr04") {
             }
             return err;
         }
@@ -182,7 +195,7 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
 
                                 <div className="inline-block">
                                     <h2 className="text-2xl font-semibold font-poppins">{publicProfileState.data.fullName}</h2>
-                                    <p className="mt-[3px] text-base text-gray-600">100 friends</p>
+                                    <p className="mt-[3px] text-base text-gray-600">{publicProfileState.data.numbersOfFriend} friends</p>
                                 </div>
                             </div>
                             <div className="-translate-y-4">
