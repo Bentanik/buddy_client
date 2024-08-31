@@ -169,12 +169,12 @@ export default function ProfileComponent() {
                                 </div>
                             </div>
                             <div className="-translate-y-4">
-                                <button className="px-3 py-2 bg-blue-400 rounded-xl hover:bg-blue-500">
+                                <button className="px-3 py-2 bg-blue-500 rounded-xl hover:bg-blue-600">
                                     <div className="flex items-center gap-x-3">
                                         <i>
-                                            <Pencil className="text-black w-5 h-5" />
+                                            <Pencil className="text-white w-5 h-5" />
                                         </i>
-                                        <span className="text-base font-medium">Edit profile</span>
+                                        <span className="text-base text-white font-medium">Edit profile</span>
                                     </div>
                                 </button>
                             </div>

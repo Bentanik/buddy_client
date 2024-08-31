@@ -33,7 +33,7 @@ export default function NotificationComponent() {
     const createConnection = async () => {
         const newConnection = new HubConnectionBuilder()
             .withUrl(
-                `${process.env.NEXT_PUBLIC_SERVER}/hub/notification?userId=${userState.user?.id}`)
+                `${process.env.NEXT_PUBLIC_SERVER}/hub?userId=${userState.user?.id}`)
             .withAutomaticReconnect()
             .build();
 

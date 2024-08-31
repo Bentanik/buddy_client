@@ -5,12 +5,13 @@ import TextViewMore from '@/components/TextViewMore/TextViewMore'
 import { ErrorResponse, getProfileUserThunk, getStatusFriendThunk, putAcceptFriendThunk, postAddFriendThunk, putRejectFriendThunk, deleteUnfriendThunk, getNumbersOfFriendThunk, getNineImagesThunk, getNineFriendsThunk } from '@/stores/publicUserProfileSlice'
 import { useAppDispatch, useAppSelector } from '@/stores/store'
 import { Backdrop, CircularProgress } from '@mui/material'
-import { GraduationCap, UserCheck, UserPlus, UserX } from 'lucide-react'
+import { GraduationCap, MessageCircleMore, UserCheck, UserPlus, UserX } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import TippyHeadless from "@tippyjs/react/headless";
-
+import { useRouter } from 'next/navigation'
+import { OpenMessage } from '@/stores/messageSlice'
 
 interface PublicProfileComponentProps {
     userId: string
@@ -26,6 +27,8 @@ interface StatusFriendProps {
 
 export default function PublicProfileComponent({ userId }: PublicProfileComponentProps) {
     const dispatch = useAppDispatch();
+    const router = useRouter();
+    const userState = useAppSelector(state => state.userSlice);
     const publicProfileState = useAppSelector(state => state.publicUserProfileSlice);
 
     const [statusFriend, setStatusFriend] = useState<StatusFriendProps | null>(null);
@@ -93,6 +96,10 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
     }
 
     useEffect(() => {
+        if (userState?.user?.id === userId) {
+            return router.push("/profile");
+        }
+
         fetchUserProfile();
         fetchNumbersOfFriendProfile();
         fetchStatusFriendUserProfile();
@@ -208,6 +215,14 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
         })
     }
 
+    const handleOpenMessage = () => {
+        return dispatch(OpenMessage({
+            userId: publicProfileState?.data?.userId,
+            avatar: publicProfileState?.data?.cropAvatar,
+            fullName: publicProfileState?.data?.fullName,
+        }));
+    }
+
     return (
         <div>
             <header className={`sticky top-0 w-full z-50`}>
@@ -319,37 +334,47 @@ export default function PublicProfileComponent({ userId }: PublicProfileComponen
                                             </>
                                         }
                                         {statusFriend?.status === 1 &&
-                                            <TippyHeadless
-                                                interactive
-                                                placement="top-start"
-                                                offset={[-10, 5]}
-                                                visible={openOptionFriended}
-                                                render={(attrs) => (
-                                                    <div {...attrs}>
-                                                        <div className="w-[200px] max-h-[calc(min((100vh-96px)-60px),734px)] min-h-[30px] py-2 rounded-md shadow-md bg-white">
-                                                            <div className='px-2 py-1'>
-                                                                <div className='px-2 py-2 rounded-md  cursor-pointer hover:bg-gray-200' onClick={handleUnfriend}>
-                                                                    <div className='flex gap-x-2 '>
-                                                                        <i>
-                                                                            <UserX className="text-gray-800 w-6 h-6" />
-                                                                        </i>
-                                                                        <span className="text-base font-medium">Unfriend</span>
+                                            <div className='flex items-center gap-x-3'>
+                                                <TippyHeadless
+                                                    interactive
+                                                    placement="top-start"
+                                                    offset={[-10, 5]}
+                                                    visible={openOptionFriended}
+                                                    render={(attrs) => (
+                                                        <div {...attrs}>
+                                                            <div className="w-[200px] max-h-[calc(min((100vh-96px)-60px),734px)] min-h-[30px] py-2 rounded-md shadow-md bg-white">
+                                                                <div className='px-2 py-1'>
+                                                                    <div className='px-2 py-2 rounded-md  cursor-pointer hover:bg-gray-200' onClick={handleUnfriend}>
+                                                                        <div className='flex gap-x-2 '>
+                                                                            <i>
+                                                                                <UserX className="text-gray-800 w-6 h-6" />
+                                                                            </i>
+                                                                            <span className="text-base font-medium">Unfriend</span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    )}
+                                                    onClickOutside={handleCloseFriended}
+                                                >
+                                                    <button type='button' className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]"><div className="flex items-center gap-x-3" onClick={handleToggleOpenFriended}>
+                                                        <i>
+                                                            <UserCheck className="text-black w-6 h-6" />
+                                                        </i>
+                                                        <span className="text-base font-medium">Friend</span>
                                                     </div>
-                                                )}
-                                                onClickOutside={handleCloseFriended}
-                                            >
-                                                <button type='button' className="px-3 py-2 bg-[#e2e5e9] rounded-xl hover:bg-[#d4d7da]"><div className="flex items-center gap-x-3" onClick={handleToggleOpenFriended}>
-                                                    <i>
-                                                        <UserCheck className="text-black w-6 h-6" />
-                                                    </i>
-                                                    <span className="text-base font-medium">Friend</span>
-                                                </div>
+                                                    </button>
+                                                </TippyHeadless>
+                                                <button type="button" className="px-3 py-2 bg-blue-500 rounded-xl hover:bg-blue-600" onClick={handleOpenMessage}>
+                                                    <div className="flex items-center gap-x-3">
+                                                        <i>
+                                                            <MessageCircleMore className="text-white w-5 h-5" />
+                                                        </i>
+                                                        <span className="text-base text-white font-medium">Message</span>
+                                                    </div>
                                                 </button>
-                                            </TippyHeadless>
+                                            </div>
                                         }
                                     </div>
                                 }

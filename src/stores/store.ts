@@ -19,6 +19,7 @@ import userSlice from "@/stores/userSlice";
 import userProfileSlice from "@/stores/userProfileSlice";
 import publicUserProfileSlice from "@/stores/publicUserProfileSlice";
 import notificationSlice from "@/stores/notificationSlice";
+import messageSlice from "@/stores/messageSlice";
 
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
@@ -26,7 +27,7 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["userSlice"],
+  whitelist: ["userSlice", "messageSlice"],
   blacklist: [
     "authSlice",
     "registerSlice",
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   userProfileSlice: userProfileSlice,
   publicUserProfileSlice: publicUserProfileSlice,
   notificationSlice: notificationSlice,
+  messageSlice: messageSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
