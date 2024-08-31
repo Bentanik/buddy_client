@@ -1,11 +1,18 @@
 'use client'
-import { useRef, useState } from "react";
-import styles from "@/components/Message/Message.module.css"
+import { useEffect, useRef, useState } from "react";
 import { CirclePlus, Images, Mic, Send } from "lucide-react";
 import TippyHeadless from "@tippyjs/react/headless";
 import Tippy from '@tippyjs/react';
+import { signalRService } from "@/tools/signalR";
+import { useAppSelector } from "@/stores/store";
 
-export default function MessageInputComponent() {
+interface MessageInputComponentProps {
+    userId: string
+}
+
+export default function MessageInputComponent({ userId }: MessageInputComponentProps) {
+
+    const userState = useAppSelector(state => state.userSlice);
     const inputRef = useRef<HTMLDivElement>(null);
     const [isText, setIsText] = useState<boolean>(false);
     const [openPopupOption, setOpenPopupOption] = useState<boolean>(false);
@@ -25,6 +32,17 @@ export default function MessageInputComponent() {
 
     const handleClosePopupOption = () => {
         setOpenPopupOption(false);
+    }
+
+    const handleSubmit = async () => {
+        if (inputRef.current?.innerText) {
+            const form = {
+                userInitId: userState?.user?.id || "",
+                userReceiveId: userId,
+                content: inputRef.current?.innerText
+            }
+            await signalRService.connection?.send("SendMessageAsync", form);
+        }
     }
 
     return (
@@ -139,6 +157,7 @@ export default function MessageInputComponent() {
                     <button
                         type="button"
                         className="w-8 h-8 rounded-full text-2xl opacity-70 hover:bg-black/10 flex justify-center items-center group"
+                        onClick={handleSubmit}
                     >
                         <i>
                             <Send strokeWidth={2.75} className='text-blue-600 group-hover:text-blue-700 w-5 h-5' />

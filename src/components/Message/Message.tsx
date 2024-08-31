@@ -3,7 +3,6 @@
 import MessageBoxComponent from "@/components/Message/MessageBoxComponent";
 import { CloseMessage, UnHideMessage } from "@/stores/messageSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
-import { Skeleton } from "@mui/material";
 import { X } from "lucide-react";
 
 export default function Message({ children }: { children: React.ReactNode }) {

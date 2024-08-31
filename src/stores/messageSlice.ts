@@ -33,7 +33,6 @@ const messageSlice = createSlice({
       const index = state.boxMessages.findIndex(
         (state: BoxMessage) => state?.userId === userId
       );
-      console.log(index);
       if (index === -1) {
         state.boxMessages.push({
           userId: userId,

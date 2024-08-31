@@ -106,7 +106,7 @@ export default function MessageBoxComponent({ index, userId, fullName, avatar }:
         </div>
         <div className="py-3 px-2">
           <div>
-            <MessageInputComponent />
+            <MessageInputComponent userId={userId} />
           </div>
         </div>
       </div>

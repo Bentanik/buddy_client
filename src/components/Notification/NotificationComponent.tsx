@@ -1,26 +1,19 @@
-'use client'
+'use client';
 import { setCountNotification, setNotificationFriend } from "@/stores/notificationSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import TippyHeadless from "@tippyjs/react/headless";
 import ViewAddFriendNotification from "@/components/Notification/ViewAddFriendNotification";
 import styles from "@/components/Notification/Notification.module.css";
-
+import { signalRService } from "@/tools/signalR";
 
 export default function NotificationComponent() {
     const userState = useAppSelector(state => state.userSlice);
     const notificationState = useAppSelector(state => state.notificationSlice);
-    
+
     const dispatch = useAppDispatch();
-
-    const [connection, setConnection] = useState<any>(null);
     const [openPopup, setOpenPopup] = useState<boolean>(false);
-
-    const handleOpenPopup = () => {
-        setOpenPopup(true);
-    }
 
     const handleTogglePopup = () => {
         setOpenPopup(prev => !prev);
@@ -30,57 +23,53 @@ export default function NotificationComponent() {
         setOpenPopup(false);
     }
 
-    const createConnection = async () => {
-        const newConnection = new HubConnectionBuilder()
-            .withUrl(
-                `${process.env.NEXT_PUBLIC_SERVER}/hub?userId=${userState.user?.id}`)
-            .withAutomaticReconnect()
-            .build();
-
-        setConnection(newConnection);
-    };
-
     const fetchConnection = async () => {
-        await connection?.send("CountNotification", userState.user?.id);
+        await signalRService.send("CountNotification", userState.user?.id);
     }
 
     useEffect(() => {
-        createConnection();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        if (userState?.user?.id) {
+            signalRService.createConnection(userState.user.id);
+        }
+    }, [])
 
     useEffect(() => {
-        if (connection) {
-            connection
-                .start()
-                .then(() => {
-                    fetchConnection();
-                    connection.on("onError", (message: string) => { console.log(message) });
+        if (signalRService.connection !== null) {
+            signalRService.startConnection()?.then(() => {
+                fetchConnection();
 
-                    connection.on("onSuccess", (message: string) => { console.log(message) });
+                signalRService.on("onError", (message: string) => {
+                    console.log(message);
+                });
 
-                    connection.on("onCountNotification", (countNotification: number) => {
-                        dispatch(setCountNotification({
-                            countNotification: countNotification,
-                        }))
-                    });
+                signalRService.on("onSuccess", (message: string) => {
+                    console.log(message);
+                });
 
-                    connection.on("onFriendNotification", (notification: any) => {
-                        if (notification !== null) {
-                            dispatch(setNotificationFriend({
-                                userId: notification.UserId,
-                                fullName: notification.FullName,
-                                cropAvatar: notification.CropAvatar,
-                            }))
-                            fetchConnection();
-                        }
-                    })
+                signalRService.on("onCountNotification", (countNotification: number) => {
+                    dispatch(setCountNotification({
+                        countNotification: countNotification,
+                    }));
+                });
 
-                })
-                .catch();
+                signalRService.on("onMessage", (message: number) => {
+                    console.log(message);
+                });
+
+                signalRService.on("onFriendNotification", (notification: any) => {
+                    if (notification !== null) {
+                        dispatch(setNotificationFriend({
+                            userId: notification.UserId,
+                            fullName: notification.FullName,
+                            cropAvatar: notification.CropAvatar,
+                        }));
+                        fetchConnection();
+                    }
+                });
+            }).catch(err => console.error("Error starting connection:", err));
         }
-    }, [connection]);
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [signalRService.connection]);
 
     return (
         <TippyHeadless
@@ -112,6 +101,6 @@ export default function NotificationComponent() {
                     <span className="text-[13px] text-gray-200">{notificationState.countNotification}</span>
                 </div>}
             </div>
-        </TippyHeadless >
-    )
+        </TippyHeadless>
+    );
 }
