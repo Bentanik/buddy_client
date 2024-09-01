@@ -4,21 +4,22 @@ import MessageBoxComponent from "@/components/Message/MessageBoxComponent";
 import { CloseMessage, UnHideMessage } from "@/stores/messageSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
 import { X } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Message({ children }: { children: React.ReactNode }) {
 
     const messageState = useAppSelector(state => state.messageSlice);
     const dispatch = useAppDispatch();
 
-    const handleUnHideMessage = (index: number) => {
+    const handleUnHideMessage = (userId: number) => {
         dispatch(UnHideMessage({
-            index: index
+            userId: userId
         }))
     }
 
-    const handleCloseMessage = (index: number) => {
+    const handleCloseMessage = (userId: number) => {
         dispatch(CloseMessage({
-            index: index
+            userId: userId
         }))
     }
 
@@ -36,12 +37,12 @@ export default function Message({ children }: { children: React.ReactNode }) {
                                         width={100}
                                         height={100}
                                         alt="avatar"
-                                        onClick={() => handleUnHideMessage(index)}
+                                        onClick={() => handleUnHideMessage(item?.userId)}
                                     />
                                     <div className="hidden absolute -top-[80%] right-0 w-max px-2 py-1 shadow-box-shadown rounded-lg bg-slate-100 z-50 group-hover:block">
                                         <span className="text-[12px]">{item?.fullName}</span>
                                     </div>
-                                    <button className="hidden absolute -top-1 right-0 group-hover:block z-50" onClick={() => handleCloseMessage(index)}>
+                                    <button className="hidden absolute -top-1 right-0 group-hover:block z-50" onClick={() => handleCloseMessage(item?.userId)}>
                                         <div className="p-[2px] rounded-full bg-white">
                                             <i>
                                                 <X className="w-4 h-4" />
@@ -57,8 +58,8 @@ export default function Message({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="fixed bottom-0 right-20 z-50">
                     <div className="flex gap-x-2">
-                        {messageState.boxMessages?.filter((item: any) => item.active)?.map((item: any, index: any) => {
-                            return <MessageBoxComponent key={index} index={index} userId={item?.userId} avatar={item?.avatar} fullName={item?.fullName} />
+                        {messageState?.boxMessages?.filter((item: any) => item.active)?.map((item: any, index: any) => {
+                            return <MessageBoxComponent key={index} index={index} userId={item?.userId} avatar={item?.avatar} fullName={item?.fullName} messages={item?.messages} />
                         })
                         }
                     </div>

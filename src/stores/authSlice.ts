@@ -1,4 +1,5 @@
 import { LoginApi, LogoutApi } from "@/apis/auth/auth";
+import { ResetMessengerState } from "@/stores/messageSlice";
 import { resetUserState, setUser } from "@/stores/userSlice";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
@@ -57,6 +58,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { dispatch }) => {
     const response = await LogoutApi();
     dispatch(resetUserState());
+    dispatch(ResetMessengerState());
     return response.data;
   }
 );

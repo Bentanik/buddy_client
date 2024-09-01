@@ -3,19 +3,61 @@ import { useEffect, useRef, useState } from "react";
 import { CirclePlus, Images, Mic, Send } from "lucide-react";
 import TippyHeadless from "@tippyjs/react/headless";
 import Tippy from '@tippyjs/react';
-import { signalRService } from "@/tools/signalR";
-import { useAppSelector } from "@/stores/store";
+import { useAppDispatch, useAppSelector } from "@/stores/store";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { GetMessage } from "@/stores/messageSlice";
 
 interface MessageInputComponentProps {
-    userId: string
+    userId: string,
 }
 
 export default function MessageInputComponent({ userId }: MessageInputComponentProps) {
 
+    const dispatch = useAppDispatch();
     const userState = useAppSelector(state => state.userSlice);
     const inputRef = useRef<HTMLDivElement>(null);
     const [isText, setIsText] = useState<boolean>(false);
     const [openPopupOption, setOpenPopupOption] = useState<boolean>(false);
+    const [connection, setConnection] = useState<any>(null);
+
+    const createConnection = async () => {
+        const newConnection = new HubConnectionBuilder()
+            .withUrl(
+                `${process.env.NEXT_PUBLIC_SERVER}/hub?userId=${userState.user?.id}`)
+            .withAutomaticReconnect()
+            .build();
+
+        setConnection(newConnection);
+    };
+
+    useEffect(() => {
+        createConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (connection) {
+            connection
+                .start()
+                .then(() => {
+                    connection.on("onError", (message: string) => { console.log(message) });
+
+                    connection.on("onSuccess", (message: string) => { console.log(message) });
+
+                    connection.on("onMessage", (message: any) => {
+                        dispatch(GetMessage({
+                            userId: userState?.user?.id !== message?.SenderId ? message?.SenderId : message?.ReceiverId,
+                            data: {
+                                senderId: message?.SenderId,
+                                receiverId: message?.ReceiverId,
+                                content: message?.Content
+                            }
+                        }))
+                    })
+                })
+                .catch();
+        }
+    }, [connection]);
 
     const handleInput = () => {
         if (inputRef.current) {
@@ -41,7 +83,8 @@ export default function MessageInputComponent({ userId }: MessageInputComponentP
                 userReceiveId: userId,
                 content: inputRef.current?.innerText
             }
-            await signalRService.connection?.send("SendMessageAsync", form);
+            inputRef.current.innerText = "";
+            await connection?.send("SendMessageAsync", form);
         }
     }
 
