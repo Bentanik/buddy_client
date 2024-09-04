@@ -1,69 +1,20 @@
 'use clien'
 /* eslint-disable @next/next/no-img-element */
-import { GetTwoNotificationFriendThunk, setCountNotification } from "@/stores/notificationSlice";
-import { ErrorResponse, putAcceptFriendThunk, putRejectFriendThunk } from "@/stores/publicUserProfileSlice";
-import { useAppDispatch, useAppSelector } from "@/stores/store";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 interface ViewAddFriendNotificationProps {
-    open: boolean
+    notificationFriends: any,
+    onAcceptFriend: any,
+    onRejectFriend: any,
 }
 
-export default function ViewAddFriendNotification({ open }: ViewAddFriendNotificationProps) {
-    const dispatch = useAppDispatch();
-    const publicProfileState = useAppSelector(state => state.publicUserProfileSlice);
-
-    const [notificationFriend, setNotificationFriend] = useState<any>(null);
-
-    const fetchNotificationFriend = async () => {
-        try {
-            const res = await
-                dispatch(GetTwoNotificationFriendThunk()).unwrap();
-            setNotificationFriend(res?.data);
-            dispatch(setCountNotification({
-                countNotification: 0,
-            }));
-        } catch (err) {
-            return err;
-        }
+export default function ViewAddFriendNotification({ notificationFriends, onAcceptFriend, onRejectFriend }: ViewAddFriendNotificationProps) {
+    const handleAcceptFriend = (user: any) => {
+        onAcceptFriend(user);
     }
 
-    useEffect(() => {
-        if (open === true) {
-            fetchNotificationFriend();
-        }
-    }, [open])
-
-    const handleAcceptFriend = async (user: any) => {
-        try {
-            await dispatch(putAcceptFriendThunk({
-                userReceiveId: user?.data?.userId
-            })).unwrap();
-            fetchNotificationFriend();
-        } catch (err) {
-            const errors = err as ErrorResponse[];
-
-            if (errors && errors[0]?.errorCode === "adfr03") {
-                window.location.reload()
-            }
-            return err;
-        }
-    }
-
-    const handleRejectFriend = async (user: any) => {
-        try {
-            await dispatch(putRejectFriendThunk({
-                userReceiveId: user?.data?.userId
-            })).unwrap();
-            fetchNotificationFriend();
-        } catch (err) {
-            const errors = err as ErrorResponse[];
-            if (errors && errors[0]?.errorCode === "adfr03") {
-                window.location.reload()
-            }
-            return err;
-        }
+    const handleRejectFriend = (user: any) => {
+        onRejectFriend(user);
     }
 
     const BoxAddFriend = (user: any) => {
@@ -95,7 +46,7 @@ export default function ViewAddFriendNotification({ open }: ViewAddFriendNotific
     }
 
     const ListNotificationFriend = () => {
-        return notificationFriend?.map((item: any, index: number) => {
+        return notificationFriends?.map((item: any, index: number) => {
             return <BoxAddFriend key={index} data={item} />
         })
     }

@@ -1,4 +1,7 @@
-import { getMessageHistoryApi } from "@/apis/user/message";
+import {
+  getMessageHistoryApi,
+  getTheseFriendsMessagedApi,
+} from "@/apis/user/message";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Stethoscope } from "lucide-react";
 
@@ -37,12 +40,14 @@ export interface GetMessageHistoryUserThunkData {
 
 export interface InitialState {
   status: string;
+  statusGetTheseFriend: string;
   boxMessages: Array<BoxMessage>;
   error?: ErrorResponse[] | null;
 }
 
 let initialState: InitialState = {
   status: "idle",
+  statusGetTheseFriend: "idle",
   boxMessages: [],
   error: null,
 };
@@ -63,6 +68,14 @@ export const getMessageHistoryUserThunk = createAsyncThunk(
         data: response.data?.data,
       })
     );
+  }
+);
+
+export const getTheseFriendsMessagedThunk = createAsyncThunk(
+  "auth/getTheseFriendsMessaged",
+  async (_, {}) => {
+    const response = await getTheseFriendsMessagedApi();
+    return response?.data;
   }
 );
 
@@ -133,10 +146,10 @@ const messageSlice = createSlice({
       }
     },
     ResetMessengerState: (state) => {
-      state.status =  "idle";
+      state.status = "idle";
       state.boxMessages = [];
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -148,6 +161,16 @@ const messageSlice = createSlice({
       })
       .addCase(getMessageHistoryUserThunk.rejected, (state) => {
         state.status = "failed";
+      })
+      // ================
+      .addCase(getTheseFriendsMessagedThunk.pending, (state) => {
+        state.statusGetTheseFriend = "loading";
+      })
+      .addCase(getTheseFriendsMessagedThunk.fulfilled, (state) => {
+        state.statusGetTheseFriend = "succeeded";
+      })
+      .addCase(getTheseFriendsMessagedThunk.rejected, (state) => {
+        state.statusGetTheseFriend = "failed";
       });
   },
 });
@@ -159,7 +182,7 @@ export const {
   UnHideMessage,
   PushMessage,
   GetMessage,
-  ResetMessengerState
+  ResetMessengerState,
 } = messageSlice.actions;
 
 export default messageSlice.reducer;

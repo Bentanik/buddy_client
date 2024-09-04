@@ -1,4 +1,5 @@
 import styles from "@/components/Message/Message.module.css";
+import ViewTheseFriendMessaged from "@/components/Message/ViewTheseFriendMessaged";
 import TippyHeadless from "@tippyjs/react/headless";
 import { MessageCircleMore } from "lucide-react";
 import { useState } from "react";
@@ -16,6 +17,8 @@ export default function MessageComponent() {
         setPopupMessage(false)
     }
 
+
+
     return (
         <TippyHeadless
             interactive
@@ -30,9 +33,8 @@ export default function MessageComponent() {
                                 Messaage
                             </h3>
                             <div className={`h-[80vh] overflow-y-auto ${styles.notification}`}>
-                                <div className="px-3">
-                                    {/* <ViewAddFriendNotification open={openPopup} /> */}
-                                    123
+                                <div>
+                                    {popupMessage && <ViewTheseFriendMessaged onClose={handleClosePopupMessage} />}
                                 </div>
                             </div>
                         </div>

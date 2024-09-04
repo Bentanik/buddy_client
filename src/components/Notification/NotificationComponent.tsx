@@ -1,5 +1,5 @@
 'use client'
-import { setCountNotification, setNotificationFriend } from "@/stores/notificationSlice";
+import { GetTwoNotificationFriendThunk, setCountNotification, setNotificationFriend } from "@/stores/notificationSlice";
 import { useAppDispatch, useAppSelector } from "@/stores/store";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { Bell } from "lucide-react";
@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import TippyHeadless from "@tippyjs/react/headless";
 import ViewAddFriendNotification from "@/components/Notification/ViewAddFriendNotification";
 import styles from "@/components/Notification/Notification.module.css";
+import { ErrorResponse, putAcceptFriendThunk, putRejectFriendThunk } from "@/stores/publicUserProfileSlice";
 
 
 export default function NotificationComponent() {
@@ -17,6 +18,9 @@ export default function NotificationComponent() {
 
     const [connection, setConnection] = useState<any>(null);
     const [openPopup, setOpenPopup] = useState<boolean>(false);
+
+    const [notificationFriends, setNotificationFriends] = useState<any>(null);
+
 
     const handleOpenPopup = () => {
         setOpenPopup(true);
@@ -48,6 +52,25 @@ export default function NotificationComponent() {
         createConnection();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const fetchNotificationFriend = async () => {
+        try {
+            const res = await
+                dispatch(GetTwoNotificationFriendThunk()).unwrap();
+            setNotificationFriends(res?.data);
+            dispatch(setCountNotification({
+                countNotification: 0,
+            }));
+        } catch (err) {
+            return err;
+        }
+    }
+
+    useEffect(() => {
+        if (openPopup === true) {
+            fetchNotificationFriend();
+        }
+    }, [openPopup]);
 
     useEffect(() => {
         if (connection) {
@@ -81,6 +104,37 @@ export default function NotificationComponent() {
         }
     }, [connection]);
 
+    const handleAcceptFriend = async (user: any) => {
+        try {
+            await dispatch(putAcceptFriendThunk({
+                userReceiveId: user?.data?.userId
+            })).unwrap();
+            fetchNotificationFriend();
+        } catch (err) {
+            const errors = err as ErrorResponse[];
+
+            if (errors && errors[0]?.errorCode === "adfr03") {
+                window.location.reload()
+            }
+            return err;
+        }
+    }
+
+    const handleRejectFriend = async (user: any) => {
+        try {
+            await dispatch(putRejectFriendThunk({
+                userReceiveId: user?.data?.userId
+            })).unwrap();
+            fetchNotificationFriend();
+        } catch (err) {
+            const errors = err as ErrorResponse[];
+            if (errors && errors[0]?.errorCode === "adfr03") {
+                window.location.reload()
+            }
+            return err;
+        }
+    }
+
 
     return (
         <TippyHeadless
@@ -97,7 +151,8 @@ export default function NotificationComponent() {
                             </h3>
                             <div className={`h-[80vh] overflow-y-auto ${styles.notification}`}>
                                 <div className="px-3">
-                                    <ViewAddFriendNotification open={openPopup} />
+                                    {notificationFriends !== null && notificationFriends?.length > 0 && <ViewAddFriendNotification notificationFriends={notificationFriends} onAcceptFriend={handleAcceptFriend}
+                                        onRejectFriend={handleRejectFriend} />}
                                 </div>
                             </div>
                         </div>

@@ -1,20 +1,28 @@
-import Image from 'next/image'
+/* eslint-disable @next/next/no-img-element */
+import { useAppSelector } from '@/stores/store'
+import { Skeleton } from '@mui/material';
 
 export default function HomeFollow() {
+
+    const userState = useAppSelector(state => state.userSlice);
+
     return (
         <div className='rounded-lg bg-gray-100 p-[15px] flex flex-col gap-y-5'>
             <div className='flex gap-x-3'>
-                <figure style={{ borderRadius: '50%', overflow: 'hidden', width: '48px', height: '48px' }}>
-                    <Image
-                        src="/home.jpg"
-                        objectFit="cover"
-                        width={100}
-                        height={100}
-                        quality={100}
-                        alt="avatar"
-                    />
-                </figure>
-                <span className='flex-1 font-semibold'>Nguyen Mai Viet Vy</span>
+                {
+                    userState?.user?.avatar && userState?.user?.avatar !== "" ?
+                        <figure className="rounded-full overflow-hidden w-12 h-12"
+                        >
+                            <img
+                                src={userState?.user?.avatar}
+                                width={100}
+                                height={100}
+                                alt="avatar"
+                            />
+                        </figure>
+                        : <Skeleton width={"100%"} height={"100%"} className="rounded-full" />
+                }
+                <span className='flex-1 font-semibold'>{userState?.user?.fullName}</span>
             </div>
             <div className='flex justify-between'>
                 <div className='flex flex-col items-center'>
